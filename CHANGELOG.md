@@ -16,6 +16,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
   `python3 automation/scripts/entry_points.py`.
 
 ### Fixed
+- **Gate reads the policy.** `validate_pr` applies `agents/policies/gates.yml`
+  (`low` → one reviewer) and `core/model/transitions.yml` (human-only
+  `Removed`, forbidden pairs). It no longer invents reviewer counts in Python.
+- **GitHub Projects trace.** The connector fills `branch` and `change_link`, and
+  the digest query accepts an organization **or** a user owner.
+- **PR context overlay.** `build_context.py` prefers a board snapshot; the
+  declared `pact-context` is the fallback (`source: declared`).
 - **Leak denylist file.** `check_leaks` no longer applies the denylist rule to
   `.leakcheck-denylist` or `.leakcheck-denylist.example`, so configuring literal
   terms via the git-ignored file does not fail the list against itself.

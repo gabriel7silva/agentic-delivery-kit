@@ -60,12 +60,16 @@ The validator needs to know the item, its claims and the reviewer verdicts. Two 
 ```
 ````
 
-**From the tool** — a step **you write** queries the source of truth and writes `context.json`.
-The workflows call `validate_pr.py --context context.json` when that file exists. The sync
-connectors in `.pact/automation/sync/` are read / dry-run reference code; they do **not**
-populate `context.json` for you.
+**From the board** — a step **you write** queries the source of truth and writes
+`board-snapshot.json` (a JSON list of `sync_core.Item` dicts). The copy-ready workflow runs
+`.pact/automation/scripts/build_context.py`, which overlays board fields (`wi_state`, `risk`,
+`claim`, `branch`, `homolog_link`) on the declared `pact-context` and writes `context.json`
+with `source: sot`. The sync connectors remain read / dry-run reference code; they do **not**
+call the API in CI. Sanitized payloads for a local parse live in
+`automation/tests/fixtures/api/`.
 
-Until that step exists, a passing guard proves the context the author pasted, not the board.
+Until that snapshot exists, `build_context.py` copies the declared block with `source: declared`.
+A passing guard then proves the author's paste, not the board.
 
 The receipt and the conclusion comment are read from the PR body under `## Receipt` and
 `## Conclusion`, or from files via `--receipt` / `--conclusion`. The method still wants those

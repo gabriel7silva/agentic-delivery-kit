@@ -35,11 +35,43 @@ def test_open_claim_elsewhere_on_touched_scope(run, pr_case, base_context, good_
 
 
 def test_missing_required_reviewer(run, pr_case, base_context, good_body):
+    """medium / all_scope_reviewers: dropping one of two reviewers still fails."""
     ctx = copy.deepcopy(base_context)
-    ctx["verdicts"] = ctx["verdicts"][:1]  # drop delivery-compliance
-    code, out = run("validate_pr.py", *pr_case(["docs/guide.md"], ctx, good_body))
+    ctx["item"]["risk"] = "medium"
+    ctx["handoff_scopes"] = ["app"]
+    ctx["claims"]["this_item"] = ["app"]
+    ctx["verdicts"] = [
+        {"reviewer": "reviewer-correctness", "verdict": "pass", "risk": "medium", "findings": []},
+    ]
+    code, out = run("validate_pr.py", *pr_case(["src/app.py"], ctx, good_body))
     assert code == 1
     assert "RULE-REVIEW-GATE" in out and "reviewer-delivery-compliance" in out
+
+
+def test_low_risk_one_reviewer_is_enough(run, pr_case, base_context, good_body):
+    """gates.yml: low → reviewers: one. A docs change with one of two verdicts must pass."""
+    ctx = copy.deepcopy(base_context)
+    ctx["verdicts"] = ctx["verdicts"][:1]
+    code, out = run("validate_pr.py", *pr_case(["docs/guide.md"], ctx, good_body))
+    assert code == 0, out
+
+
+def test_low_risk_zero_reviewers_still_fails(run, pr_case, base_context, good_body):
+    ctx = copy.deepcopy(base_context)
+    ctx["verdicts"] = []
+    code, out = run("validate_pr.py", *pr_case(["docs/guide.md"], ctx, good_body))
+    assert code == 1
+    assert "RULE-REVIEW-GATE" in out
+
+
+def test_implementer_may_not_set_removed(run, pr_case, base_context, good_body):
+    """transitions.yml: REMOVED is human_only. The validator must read that, not hard-code Closed only."""
+    ctx = copy.deepcopy(base_context)
+    ctx["target_state"] = "REMOVED"
+    ctx["actor_role"] = "implementer"
+    code, out = run("validate_pr.py", *pr_case(["docs/guide.md"], ctx, good_body))
+    assert code == 1
+    assert "RULE-STATE" in out or "human" in out.lower() or "REMOVED" in out
 
 
 def test_blocking_finding_blocks(run, pr_case, base_context, good_body):

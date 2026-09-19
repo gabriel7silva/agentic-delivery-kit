@@ -11,7 +11,7 @@ aspirational.
 ![kit-ci](https://img.shields.io/badge/kit--ci-GitHub%20Actions-3fb950)
 ![license](https://img.shields.io/badge/license-Apache--2.0-3fb950)
 ![make check](https://img.shields.io/badge/make%20check-6%20levels-3fb950)
-![tests](https://img.shields.io/badge/tests-124%20pytest-3fb950)
+![tests](https://img.shields.io/badge/tests-137%20pytest-3fb950)
 ![rules](https://img.shields.io/badge/canon%20rules-64-8b949e)
 ![tracks](https://img.shields.io/badge/tracks-ADO%20%C2%B7%20GitHub%20%C2%B7%20Notion%20%C2%B7%20Spreadsheet%20%C2%B7%20Slack-8b949e)
 ![agnostic](https://img.shields.io/badge/model%20%2F%20vendor%20%2F%20runtime-agnostic-f0883e)
@@ -628,7 +628,7 @@ On Windows without `make`: `.\check.ps1`.
 | **L0** | `make leaks` | no machine path, e-mail, handle, board / issue / repository / workspace link or denylisted term — in any file, SVGs and extensionless text (`LICENSE`, `Makefile`) included |
 | **L1** | `make links` | every link resolves · no orphan document · every `RULE-…` cited exists · `core/` names no tool, vendor, runtime or profile · `AGENTS.md` exists and every runtime pointer file points to it, names the interview and matches the generator (`make entry`) |
 | **L2** | `make schemas` `make mapping` | every YAML validates · every track maps 100 % of the 35 symbols · every `unsupported` has a substitute · `Resolved ≠ Closed` in every track |
-| **L3** | `make test` | 124 pytest tests: each documented validator refusal has a case; the model's categories, the iteration name script, the walkthrough, leaks, links, canon, instance and sync are covered too. Not one test per canon rule (there are 64 rules) |
+| **L3** | `make test` | 137 pytest tests: each documented validator refusal has a case; the model's categories, the iteration name script, the walkthrough, leaks, links, canon, instance and sync are covered too. Not one test per canon rule (there are 64 rules) |
 | **L4** | — | unused — the numbers stay so citations do not churn |
 | **L5** | `make canon` `make adapters` | every fenced copy is byte-equal to its fragment · every adapter's `out/` equals a fresh generation |
 | **L6** | `make instance` | `instance.example.yml`, every `examples/instance-*.yml`, and every `profiles/*/instance.example.yml` — including that a lifecycle subset keeps every category, the topology agrees with the roster, the iteration name pattern renders with a product behind `{product}`, and the planning day and the sprint close are different working days |

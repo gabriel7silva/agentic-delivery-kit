@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from lib.diffscope import Ownership, glob_to_regex, max_risk, specificity  # noqa: E402
+from lib.diffscope import Ownership, glob_to_regex, max_risk, missing_reviewers, specificity  # noqa: E402
 
 OWN = {
     "version": 1,
@@ -77,3 +77,30 @@ def test_max_risk():
 def test_max_risk_unknown_is_high():
     assert max_risk(["low", "critical"]) == "high"
     assert max_risk(["High"]) == "high"
+
+
+def test_missing_reviewers_low_is_one_from_the_pool():
+    own = Ownership({
+        **OWN,
+        "scopes": [
+            {**OWN["scopes"][0], "reviewers": ["reviewer-docs", "reviewer-delivery-compliance"]},
+            *OWN["scopes"][1:],
+        ],
+    }, FLOORS)
+    docs = own.resolve(["README.md"])
+    assert missing_reviewers(docs, {"reviewer-docs"}, "low") == []
+    assert missing_reviewers(docs, set(), "low") == ["reviewer-delivery-compliance", "reviewer-docs"]
+
+
+def test_missing_reviewers_medium_needs_all():
+    own = Ownership({
+        **OWN,
+        "scopes": [
+            {**OWN["scopes"][1], "reviewers": ["reviewer-correctness", "reviewer-delivery-compliance"]},
+            OWN["scopes"][0],
+            OWN["scopes"][2],
+        ],
+    }, FLOORS)
+    res = own.resolve(["src/main.py"])
+    assert "reviewer-delivery-compliance" in missing_reviewers(res, {"reviewer-correctness"}, "medium")
+    assert missing_reviewers(res, {"reviewer-correctness", "reviewer-delivery-compliance"}, "medium") == []

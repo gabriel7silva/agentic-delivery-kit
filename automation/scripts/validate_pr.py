@@ -2,6 +2,9 @@
 """The binding gate. Refuses a change that breaks scope, concurrency, review,
 risk or evidence rules — regardless of which runtime produced it.
 
+Reviewer demand and who may cross a category come from
+`agents/policies/gates.yml` and `core/model/transitions.yml` (`lib/policy.py`).
+
 Inputs are deliberately tool-neutral so the same script runs in any CI:
 
   --changed-paths FILE   one repository-relative path per line (git diff --name-only)
@@ -52,11 +55,11 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import model as M  # noqa: E402
-from lib.diffscope import RISK_ORDER, Ownership, max_risk, required_reviewers, touched_scopes  # noqa: E402
+from lib.diffscope import RISK_ORDER, Ownership, max_risk, missing_reviewers, touched_scopes  # noqa: E402
+from lib import policy as P  # noqa: E402
 from lib.report import Report  # noqa: E402
 
 CONCLUSION_FIELDS = ("Responsible", "Date", "What was done", "Link", "Evidence", "Next step")
-HUMAN_ROLES = {"approver", "product_owner"}
 PLACEHOLDER = re.compile(r"^<[^>]*>$")
 CONTEXT_BLOCK = re.compile(r"```pact-context\s*\n(.*?)\n```", re.S)
 DEFAULT_BRANCHES = {"main", "master", "trunk", "develop"}
@@ -192,11 +195,8 @@ def check_scope_and_claims(report: Report, own: Ownership, paths: list[str], ctx
         if s in elsewhere:
             report.add("claim", None, "RULE-CLAIM", f"scope '{s}' has an open claim by {elsewhere[s]} — one open claim per scope")
 
-    need = required_reviewers(res)
     verdicts = ctx.get("verdicts", [])
-    have = {v.get("reviewer") for v in verdicts}
-    for rv in sorted(need - have):
-        report.add("review", None, "RULE-REVIEW-GATE", f"required reviewer '{rv}' has not returned a verdict")
+    have = {v.get("reviewer") for v in verdicts if v.get("reviewer")}
     for v in verdicts:
         if v.get("verdict") == "block":
             report.add("review", None, "RULE-REVIEW-GATE", f"{v.get('reviewer')} returned verdict: block")
@@ -213,9 +213,11 @@ def check_scope_and_claims(report: Report, own: Ownership, paths: list[str], ctx
     declared = (ctx.get("item", {}).get("risk") or "").lower()
     if declared and declared != risk:
         report.add("item", None, "RULE-RISK", f"item risk field says '{declared}' but MAX(verdicts, floors) is '{risk}'")
+    for rv in missing_reviewers(res, have, risk):
+        report.add("review", None, "RULE-REVIEW-GATE", f"required reviewer '{rv}' has not returned a verdict")
     hr = ctx.get("human_review") or {}
     named = str(hr.get("by") or "").strip()
-    if risk == "high" and not (flag(hr.get("present")) and named):
+    if P.named_human_required(risk) and not (flag(hr.get("present")) and named):
         report.add("review", None, "RULE-RISK-GATES", "risk is high: a named human must review before Resolved, and none is recorded")
     return risk
 
@@ -243,8 +245,22 @@ def check_transition(report: Report, ctx: dict) -> None:
     target = state_category(report, raw_target, "target_state")
     current = state_category(report, raw_current, "item.wi_state")
     actor = (ctx.get("actor_role") or "").lower()
-    if target == "CLOSED" and actor not in HUMAN_ROLES:
-        report.add("transition", None, "RULE-STATE-RESOLVED-NOT-CLOSED", f"actor '{actor or 'unknown'}' may not set Closed — only {sorted(HUMAN_ROLES)}")
+    hits = P.forbidden_hits(current, target, actor) if target else []
+    for hit in hits:
+        rule, msg = P.split_reason(hit.get("reason") or "")
+        report.add("transition", None, rule, msg)
+    row = P.find_transition(current, target) if current and target and current != target else None
+    if target and current and current != target and not hits:
+        if row:
+            allowed = {b.lower() for b in (row.get("by") or [])}
+            if allowed and actor not in allowed:
+                who = sorted(allowed)
+                report.add(
+                    "transition", None, "RULE-STATES",
+                    f"actor '{actor or 'unknown'}' may not move {current} → {target} — allowed: {who}",
+                )
+        elif current and target:
+            report.add("transition", None, "RULE-STATES", f"no transition {current} → {target} in core/model/transitions.yml")
     if target == "CLOSED" and current != "RESOLVED":
         report.add("transition", None, "RULE-STATES", f"Closed is only allowed from a Resolved-category state (item is '{raw_current or 'unknown'}' → category {current or 'unknown'})")
     if target == "CLOSED" and optional_on(ctx, "require_client_signoff"):

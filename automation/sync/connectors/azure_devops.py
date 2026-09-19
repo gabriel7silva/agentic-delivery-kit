@@ -23,6 +23,7 @@ TYPE_FROM = {"Epic": "EPIC", "Feature": "FEATURE", "User Story": "STORY", "Produ
 FIELDS = ["System.Id", "System.WorkItemType", "System.Title", "System.State", "System.BoardColumn", "System.Parent",
           "System.IterationPath", "Microsoft.VSTS.Common.Priority", "System.Tags", "System.ChangedDate",
           "Custom.PACTRole", "Custom.PACTRisk", "Custom.PACTClaim", "Custom.PACTHomolog",
+          "Custom.PACTBranch", "Custom.PACTChange",
           "Microsoft.VSTS.Scheduling.StoryPoints", "Microsoft.VSTS.Scheduling.RemainingWork",
           "Microsoft.VSTS.Common.BusinessValue", "Custom.PACTExternalRef"]
 
@@ -32,6 +33,26 @@ def _get(token: str, url: str) -> dict:
     req = urllib.request.Request(url, headers={"Authorization": f"Basic {auth}"})
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.load(r)
+
+
+def items_from_workitems(data: dict) -> list[Item]:
+    items = []
+    for w in data.get("value") or []:
+        f = w.get("fields") or {}
+        items.append(Item(
+            id=str(f["System.Id"]), type=TYPE_FROM.get(f["System.WorkItemType"], "STORY"), title=f["System.Title"],
+            wi_state=STATE_FROM.get(f["System.State"], "NEW"), status=(f.get("System.BoardColumn") or "").upper().replace(" ", "_") or None,
+            parent=str(f["System.Parent"]) if f.get("System.Parent") else None, iteration=f.get("System.IterationPath"),
+            priority=f"P{f['Microsoft.VSTS.Common.Priority']}" if f.get("Microsoft.VSTS.Common.Priority") else None,
+            role=f.get("Custom.PACTRole"), risk=f.get("Custom.PACTRisk"), claim=f.get("Custom.PACTClaim"),
+            homolog_link=f.get("Custom.PACTHomolog"),
+            branch=f.get("Custom.PACTBranch"), change_link=f.get("Custom.PACTChange"),
+            effort=f.get("Microsoft.VSTS.Scheduling.StoryPoints"), remaining_work=f.get("Microsoft.VSTS.Scheduling.RemainingWork"),
+            business_value=f.get("Microsoft.VSTS.Common.BusinessValue"), external_ref=f.get("Custom.PACTExternalRef"),
+            tags=[t.strip() for t in (f.get("System.Tags") or "").split(";") if t.strip()],
+            url=w.get("url"), updated_at=f.get("System.ChangedDate"),
+        ))
+    return items
 
 
 class AzureDevOps(Connector):
@@ -46,20 +67,7 @@ class AzureDevOps(Connector):
         items = []
         for chunk in (ids[i:i + 200] for i in range(0, len(ids), 200)):
             data = _get(token, f"{base}/wit/workitems?ids={','.join(map(str, chunk))}&fields={','.join(FIELDS)}&api-version=7.1")
-            for w in data["value"]:
-                f = w["fields"]
-                items.append(Item(
-                    id=str(f["System.Id"]), type=TYPE_FROM.get(f["System.WorkItemType"], "STORY"), title=f["System.Title"],
-                    wi_state=STATE_FROM.get(f["System.State"], "NEW"), status=(f.get("System.BoardColumn") or "").upper().replace(" ", "_") or None,
-                    parent=str(f["System.Parent"]) if f.get("System.Parent") else None, iteration=f.get("System.IterationPath"),
-                    priority=f"P{f['Microsoft.VSTS.Common.Priority']}" if f.get("Microsoft.VSTS.Common.Priority") else None,
-                    role=f.get("Custom.PACTRole"), risk=f.get("Custom.PACTRisk"), claim=f.get("Custom.PACTClaim"),
-                    homolog_link=f.get("Custom.PACTHomolog"),
-                    effort=f.get("Microsoft.VSTS.Scheduling.StoryPoints"), remaining_work=f.get("Microsoft.VSTS.Scheduling.RemainingWork"),
-                    business_value=f.get("Microsoft.VSTS.Common.BusinessValue"), external_ref=f.get("Custom.PACTExternalRef"),
-                    tags=[t.strip() for t in (f.get("System.Tags") or "").split(";") if t.strip()],
-                    url=w.get("url"), updated_at=f.get("System.ChangedDate"),
-                ))
+            items.extend(items_from_workitems(data))
         return items
 
     def apply(self, changed: list[Item], removed: list[str], dry_run: bool) -> None:

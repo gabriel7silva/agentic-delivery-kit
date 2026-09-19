@@ -43,6 +43,26 @@ def _text(p: dict, name: str) -> str | None:
     return "".join(t.get("plain_text", "") for t in rt) or None
 
 
+def items_from_query(data: dict) -> list[Item]:
+    items = []
+    for page in data.get("results") or []:
+        p = page.get("properties") or {}
+        title = "".join(t.get("plain_text", "") for t in (p.get("Name") or p.get("Title") or {}).get("title", []))
+        pid = (p.get("ID") or {}).get("unique_id") or {}
+        items.append(Item(
+            id=f"{pid.get('prefix', '')}{pid.get('number', page['id'][:8])}", type=(_sel(p, "Type") or "STORY").upper(), title=title,
+            wi_state=STATE_FROM.get(_sel(p, "WI-State"), "NEW"), status=STATUS_FROM.get(_sel(p, "Status")),
+            priority=_sel(p, "Priority"), role=_sel(p, "Role"), risk=_sel(p, "Risk"), claim=_text(p, "Claim"),
+            tags=[t["name"] for t in (p.get("Tags") or {}).get("multi_select", [])],
+            branch=_text(p, "Branch"), change_link=(p.get("Change link") or {}).get("url"),
+            homolog_link=_text(p, "Homologation") or (p.get("Homologation") or {}).get("url"),
+            effort=_num(p, "Effort"), remaining_work=_num(p, "Remaining"), business_value=_num(p, "Business value"),
+            external_ref=_text(p, "External ref"),
+            url=page.get("url"), updated_at=page.get("last_edited_time"),
+        ))
+    return items
+
+
 class Notion(Connector):
     name = "notion"
     env_var = "NOTION_TOKEN"
@@ -54,21 +74,7 @@ class Notion(Connector):
         while True:
             body = {"page_size": 100, **({"start_cursor": cursor} if cursor else {})}
             data = _post(token, f"/databases/{db}/query", body)
-            for page in data["results"]:
-                p = page["properties"]
-                title = "".join(t.get("plain_text", "") for t in (p.get("Name") or p.get("Title") or {}).get("title", []))
-                pid = (p.get("ID") or {}).get("unique_id") or {}
-                items.append(Item(
-                    id=f"{pid.get('prefix', '')}{pid.get('number', page['id'][:8])}", type=(_sel(p, "Type") or "STORY").upper(), title=title,
-                    wi_state=STATE_FROM.get(_sel(p, "WI-State"), "NEW"), status=STATUS_FROM.get(_sel(p, "Status")),
-                    priority=_sel(p, "Priority"), role=_sel(p, "Role"), risk=_sel(p, "Risk"), claim=_text(p, "Claim"),
-                    tags=[t["name"] for t in (p.get("Tags") or {}).get("multi_select", [])],
-                    branch=_text(p, "Branch"), change_link=(p.get("Change link") or {}).get("url"),
-                    homolog_link=_text(p, "Homologation") or (p.get("Homologation") or {}).get("url"),
-                    effort=_num(p, "Effort"), remaining_work=_num(p, "Remaining"), business_value=_num(p, "Business value"),
-                    external_ref=_text(p, "External ref"),
-                    url=page.get("url"), updated_at=page.get("last_edited_time"),
-                ))
+            items.extend(items_from_query(data))
             if not data.get("has_more"):
                 break
             cursor = data["next_cursor"]

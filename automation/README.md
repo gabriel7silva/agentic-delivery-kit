@@ -32,13 +32,17 @@ body (or explicit receipt and conclusion files) — and refuses the change when:
 | `require_homologation_qa` is on and `Closed` has no feature branch, homologation URL, QA handoff, or key-user test | `RULE-OPT-HOMOLOG-QA` |
 | A New-category state straight to a Resolved-category one (nothing was executed); `Closed` from outside the Resolved category; a state the model does not know | `RULE-STATES` |
 
-Where the context comes from is a track concern: the orchestrator posts it into the PR body as a
-fenced ```` ```pact-context ```` JSON block, or a CI step **you write** builds it from the tool's
-API. The validator does not read the board. It **does** read `instance.yml` when present (or
-`--instance`) and the defaults of the profile it names, so `require_homologation_qa` /
-`require_client_signoff` cannot be skipped by omitting them from the context or from the
-instance. The copy-ready workflow uses the PR body until a board-backed
-`context.json` exists. A green run is not proof of a claim on the item.
+Reviewer count and human-only transitions come from `agents/policies/gates.yml` and
+`core/model/transitions.yml` (`lib/policy.py`). Low risk needs **one** reviewer from the
+scope pool; medium and high need every reviewer on the touched scopes.
+
+Where the context comes from is a track concern: the orchestrator posts a fenced
+```` ```pact-context ```` JSON block, and optionally a CI step writes `board-snapshot.json`.
+`scripts/build_context.py` overlays board fields on that declaration. The validator does not
+call the board API. It **does** read `instance.yml` when present (or `--instance`) and the
+defaults of the profile it names, so `require_homologation_qa` / `require_client_signoff`
+cannot be skipped by omitting them from the context or from the instance. A green run with
+`source: declared` is not proof of a claim on the item.
 
 ## Sync
 
@@ -56,6 +60,7 @@ to do anything — [`sync/SECURITY.md`](sync/SECURITY.md). Details in [`sync/REA
 | `check_schemas.py` | L2 | Every YAML against `schemas/`; ids that must exist; duplicate globs; floor agreement |
 | `check_mapping.py` | L2 | 100 % symbol coverage per track; substitutes present; the compatibility matrix is current |
 | `validate_pr.py` | L3 | The gate above; golden-tested in `tests/` |
+| `build_context.py` | L3 | Overlay a board snapshot on a declared `pact-context`; writes `context.json` |
 | `check_canon.py` | L5 | Fenced copies match fragments; placeholders resolve; canon only in `core/` |
 | `check_instance.py` | L6 | An instance is complete and coherent with the tracks and profiles it names — lifecycle, topology, cadence and the iteration name pattern included |
 | `render.py` | — | Optional: expand placeholders from an instance |

@@ -1,0 +1,38 @@
+{
+  "data": {
+    "organization": {
+      "projectV2": {
+        "title": "Delivery",
+        "items": {
+          "pageInfo": {"hasNextPage": false, "endCursor": null},
+          "nodes": [
+            {
+              "id": "PVTI_org1",
+              "updatedAt": "2026-01-16T12:00:00Z",
+              "content": {
+                "number": 42,
+                "title": "Export the list",
+                "url": "https://github.com/example-org/delivery/issues/42",
+                "state": "OPEN",
+                "labels": {"nodes": [{"name": "type:story"}, {"name": "claim:app"}]},
+                "linkedBranches": {"nodes": [{"ref": {"name": "feat/export-list"}}]}
+              },
+              "fieldValues": {
+                "nodes": [
+                  {"name": "Awaiting test", "field": {"name": "WI-State"}},
+                  {"name": "Awaiting test", "field": {"name": "Status"}},
+                  {"name": "Story", "field": {"name": "Type"}},
+                  {"name": "low", "field": {"name": "Risk"}},
+                  {"text": "feat/export-list", "field": {"name": "Branch"}},
+                  {"text": "https://github.com/example-org/delivery/pull/42", "field": {"name": "Change"}},
+                  {"text": "https://example.test/hms/42", "field": {"name": "Homologation"}}
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "user": null
+  }
+}

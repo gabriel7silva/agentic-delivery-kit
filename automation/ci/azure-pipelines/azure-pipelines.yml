@@ -59,11 +59,15 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
-          # Optional: a step here may write context.json from the linked work
-          # item (see .pact/automation/sync/connectors/azure_devops.py). When
-          # absent, the pact-context block in the PR description is used.
+          # Prefer board-snapshot.json from a SoT query; otherwise the declared
+          # pact-context block (source=declared).
 
           - script: |
+              ARGS="--pr-body pr-body.md --out context.json"
+              if [ -f board-snapshot.json ]; then
+                ARGS="$ARGS --snapshot board-snapshot.json"
+              fi
+              python .pact/automation/scripts/build_context.py $ARGS || true
               if [ -f context.json ]; then
                 python .pact/automation/scripts/validate_pr.py --changed-paths changed-paths.txt --context context.json --pr-body pr-body.md
               else

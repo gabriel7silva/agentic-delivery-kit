@@ -31,7 +31,7 @@ Written here so that a green build is never mistaken for more than it is.
 | Not checked | Why | What covers it |
 |---|---|---|
 | Real tool APIs (Azure DevOps, GitHub, Notion, Slack) | No credentials in CI, by design; APIs change | Connectors are read / dry-run reference code; writes are stubs. Step 9 of every `setup.md` is a manual check |
-| That the PR context matches the board | The copy-ready workflow reads a declaration in the PR body | A CI step you write builds `context.json` from the SoT |
+| That the PR context matches the board | The copy-ready workflow reads a declaration unless `board-snapshot.json` is present | `build_context.py` overlays SoT fields; without a snapshot `source` is `declared` |
 | The five HITL triggers (except high risk) | Conditions live in `escalation.yml`; the gate only binds `risk == high` | Orchestrator or a thicker gate |
 | The quality of a reviewer's judgement | The validator checks a verdict exists and has the right shape, not that it was wise | Retrospectives adjust briefs and floors — `core/ceremonies/retrospective.md` |
 | That your runtime enforces read-only or single-writer | Runtimes differ; some enforce nothing | The PR validator, on the context it is given |

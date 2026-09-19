@@ -1,0 +1,35 @@
+{
+  "data": {
+    "organization": null,
+    "user": {
+      "projectV2": {
+        "title": "Personal delivery",
+        "items": {
+          "pageInfo": {"hasNextPage": false, "endCursor": null},
+          "nodes": [
+            {
+              "id": "PVTI_user1",
+              "updatedAt": "2026-01-16T12:00:00Z",
+              "content": {
+                "number": 7,
+                "title": "A user-owned project item",
+                "url": "https://github.com/example-org/delivery/issues/7",
+                "state": "OPEN",
+                "labels": {"nodes": [{"name": "claim:docs"}]},
+                "linkedBranches": {"nodes": [{"ref": {"name": "docs/start"}}]}
+              },
+              "fieldValues": {
+                "nodes": [
+                  {"name": "In development", "field": {"name": "WI-State"}},
+                  {"name": "In development", "field": {"name": "Status"}},
+                  {"text": "docs/start", "field": {"name": "Branch"}},
+                  {"text": "https://github.com/example-org/delivery/pull/7", "field": {"name": "Change link"}}
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

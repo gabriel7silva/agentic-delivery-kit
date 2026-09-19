@@ -127,6 +127,57 @@ def test_guard_uses_categories_for_human_only_states():
     assert [k.wi_state for k in kept] == ["INTEGRATION_TEST"]
 
 
+API = Path(__file__).resolve().parent / "fixtures" / "api"
+
+
+def test_github_projects_maps_branch_and_change_from_org_fixture():
+    import json
+    from connectors.github_projects import items_from_payload
+
+    data = json.loads((API / "github" / "project-org.json").read_text(encoding="utf-8"))
+    items = items_from_payload(data)
+    assert len(items) == 1
+    assert items[0].id == "#42"
+    assert items[0].branch == "feat/export-list"
+    assert items[0].change_link == "https://github.com/example-org/delivery/pull/42"
+    assert items[0].homolog_link == "https://example.test/hms/42"
+    assert items[0].claim == "app"
+
+
+def test_github_projects_reads_user_owned_project():
+    import json
+    from connectors.github_projects import items_from_payload
+
+    data = json.loads((API / "github" / "project-user.json").read_text(encoding="utf-8"))
+    items = items_from_payload(data)
+    assert [i.id for i in items] == ["#7"]
+    assert items[0].branch == "docs/start"
+    assert items[0].change_link == "https://github.com/example-org/delivery/pull/7"
+
+
+def test_azure_connector_maps_trace_fields_from_fixture():
+    import json
+    from connectors.azure_devops import items_from_workitems
+
+    data = json.loads((API / "azure" / "workitems.json").read_text(encoding="utf-8"))
+    items = items_from_workitems(data)
+    assert items[0].id == "101"
+    assert items[0].branch == "feat/export-list"
+    assert items[0].change_link == "https://dev.azure.com/example-org/Delivery/_git/delivery/pullrequest/9"
+    assert items[0].homolog_link == "https://example.test/hms/101"
+
+
+def test_notion_connector_maps_trace_fields_from_fixture():
+    import json
+    from connectors.notion import items_from_query
+
+    data = json.loads((API / "notion" / "database-query.json").read_text(encoding="utf-8"))
+    items = items_from_query(data)
+    assert items[0].id == "WI-42"
+    assert items[0].branch == "feat/export-list"
+    assert items[0].change_link == "https://example.test/change/42"
+
+
 def test_spreadsheet_connector_reads_a_csv_export(tmp_path):
     from connectors.spreadsheet import make
     export = tmp_path / "work-items.csv"

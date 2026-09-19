@@ -5,9 +5,9 @@ name: delivery-guard
 # required status check.
 #
 # Inputs it derives itself: changed paths (git), PR body (event payload).
-# Inputs it needs from you: the pact-context block in the PR body, or a
-# context.json produced by an earlier step you write. A pass without that
-# step is a check of the author's declaration, not of the board.
+# Inputs it prefers: board-snapshot.json from an SoT query, merged by
+# build_context.py onto the pact-context block. Without a snapshot, a pass
+# is a check of the author's declaration, not of the board.
 
 on:
   pull_request:
@@ -44,9 +44,17 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: printf '%s' "$PR_BODY" > pr-body.md
 
-      # Optional: a step you write may query the source of truth and write
-      # context.json. The sync connectors do not populate that file. When it
-      # does not exist, the pact-context block in the PR body is used.
+      # Prefer a board snapshot (list of Item dicts) written by an earlier SoT
+      # query. build_context.py overlays it on the pact-context block; without a
+      # snapshot the declared PR context is the fallback (source=declared).
+
+      - name: Build context
+        run: |
+          ARGS=(--pr-body pr-body.md --out context.json)
+          if [ -f board-snapshot.json ]; then
+            ARGS+=(--snapshot board-snapshot.json)
+          fi
+          python .pact/automation/scripts/build_context.py "${ARGS[@]}" || true
 
       - name: Validate
         run: |

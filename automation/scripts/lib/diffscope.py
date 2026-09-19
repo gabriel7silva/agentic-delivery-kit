@@ -133,10 +133,33 @@ def max_risk(levels: list[str]) -> str:
 
 
 def required_reviewers(resolutions: list[Resolution]) -> set[str]:
+    """Union of reviewers on the touched scopes. Use missing_reviewers for the gate."""
     out: set[str] = set()
     for r in resolutions:
         out.update(r.scope.reviewers)
     return out
+
+
+def missing_reviewers(
+    resolutions: list[Resolution],
+    have: set[str],
+    risk: str,
+    gates_path: str | None = None,
+) -> list[str]:
+    """Who is still missing, after agents/policies/gates.yml is applied.
+
+    low → one reviewer from the pool is enough.
+    medium / high → every reviewer on every touched scope.
+    """
+    from .policy import reviewers_mode
+
+    pool = required_reviewers(resolutions)
+    mode = reviewers_mode(risk, gates_path)
+    if mode == "one":
+        if pool & have:
+            return []
+        return sorted(pool)
+    return sorted(pool - have)
 
 
 def touched_scopes(resolutions: list[Resolution]) -> set[str]:

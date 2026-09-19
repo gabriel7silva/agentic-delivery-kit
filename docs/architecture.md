@@ -46,8 +46,9 @@ the roster is neutral. Drift between a brief and generated output is caught by r
 ### 4. Single writer per scope, enforced by the gate — [ADR 0004](decisions/0004-single-writer-per-scope.md)
 
 "N readers, one writer" is data in `agents/ownership.yml`. Claims live in the source of truth,
-never in a repository file. The runtime may help; the PR validator is the guarantee. This is the
-answer to *how do several agents work on one repository without colliding*, and it does not
+never in a repository file. The runtime may help; the PR validator is the guarantee — it reads
+`agents/policies/gates.yml` and `core/model/transitions.yml` instead of restating them. This is
+the answer to *how do several agents work on one repository without colliding*, and it does not
 depend on any runtime feature.
 
 ## What is verified, by level

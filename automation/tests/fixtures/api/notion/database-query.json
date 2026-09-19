@@ -1,0 +1,25 @@
+{
+  "object": "list",
+  "has_more": false,
+  "next_cursor": null,
+  "results": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "url": "https://www.notion.so/example-org/export-the-list",
+      "last_edited_time": "2026-01-16T12:00:00.000Z",
+      "properties": {
+        "Name": {"title": [{"plain_text": "Export the list"}]},
+        "ID": {"unique_id": {"prefix": "WI-", "number": 42}},
+        "Type": {"select": {"name": "Story"}},
+        "WI-State": {"select": {"name": "Awaiting test"}},
+        "Status": {"select": {"name": "Awaiting test"}},
+        "Risk": {"select": {"name": "low"}},
+        "Claim": {"rich_text": [{"plain_text": "app"}]},
+        "Tags": {"multi_select": [{"name": "doc"}]},
+        "Branch": {"rich_text": [{"plain_text": "feat/export-list"}]},
+        "Change link": {"url": "https://example.test/change/42"},
+        "Homologation": {"rich_text": [{"plain_text": "https://example.test/hms/42"}]}
+      }
+    }
+  ]
+}

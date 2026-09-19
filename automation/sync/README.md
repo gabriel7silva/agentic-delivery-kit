@@ -19,8 +19,9 @@ source of truth ──read──► neutral ITEM records ──write──► mi
 
 ## What it does not do
 
-- Run in the kit's own CI against a live API. Tests cover in-memory diffs and "no token → exit 2".
-  There is no `automation/tests/fixtures/api/` recording.
+- Run in the kit's own CI against a live API. Tests cover in-memory diffs, "no token → exit 2",
+  and parse sanitised payloads in `automation/tests/fixtures/api/` (GitHub org/user, Azure,
+  Notion). Those fixtures are the connector contract, not a live call.
 - Store tokens. Every token comes from an environment variable — [`SECURITY.md`](SECURITY.md).
 - Send HTTP. `apply()` / `post_events()` / `post_digest()` print. `--apply` writes only the
   local `.state/` snapshot. Treat this as **read + print**, not a production sync.

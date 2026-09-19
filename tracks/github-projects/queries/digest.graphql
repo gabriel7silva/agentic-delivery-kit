@@ -2,60 +2,69 @@
 # Fetch every item in the Project with the fields the digest needs, then split
 # into the four sections client-side (the Action in automation/ci does this).
 #
-# Variables: { "org": "<organization-login>", "number": <project-number> }
-# For a user-level project use `user(login:)` instead of `organization(login:)`.
+# Variables: { "login": "<organization-or-user-login>", "number": <project-number> }
+# The query asks both organization and user; exactly one ProjectV2 is expected.
 
-query PactDigest($org: String!, $number: Int!, $after: String) {
-  organization(login: $org) {
-    projectV2(number: $number) {
-      title
-      items(first: 100, after: $after) {
-        pageInfo { hasNextPage endCursor }
-        nodes {
-          id
-          updatedAt
-          content {
-            ... on Issue {
-              number
-              title
-              url
-              state
-              labels(first: 20) { nodes { name } }
-              linkedBranches(first: 5) {
-                nodes { ref { name } }
-              }
-              comments(last: 1) {
-                nodes { body createdAt author { login } }
-              }
-            }
+fragment PactProjectItems on ProjectV2 {
+  title
+  items(first: 100, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      id
+      updatedAt
+      content {
+        ... on Issue {
+          number
+          title
+          url
+          state
+          labels(first: 20) { nodes { name } }
+          linkedBranches(first: 5) {
+            nodes { ref { name } }
           }
-          fieldValues(first: 30) {
-            nodes {
-              ... on ProjectV2ItemFieldSingleSelectValue {
-                name
-                field { ... on ProjectV2SingleSelectField { name } }
-              }
-              ... on ProjectV2ItemFieldTextValue {
-                text
-                field { ... on ProjectV2Field { name } }
-              }
-              ... on ProjectV2ItemFieldDateValue {
-                date
-                field { ... on ProjectV2Field { name } }
-              }
-              ... on ProjectV2ItemFieldNumberValue {
-                number
-                field { ... on ProjectV2Field { name } }
-              }
-              ... on ProjectV2ItemFieldIterationValue {
-                title
-                startDate
-                field { ... on ProjectV2IterationField { name } }
-              }
-            }
+          comments(last: 1) {
+            nodes { body createdAt author { login } }
           }
         }
       }
+      fieldValues(first: 30) {
+        nodes {
+          ... on ProjectV2ItemFieldSingleSelectValue {
+            name
+            field { ... on ProjectV2SingleSelectField { name } }
+          }
+          ... on ProjectV2ItemFieldTextValue {
+            text
+            field { ... on ProjectV2Field { name } }
+          }
+          ... on ProjectV2ItemFieldDateValue {
+            date
+            field { ... on ProjectV2Field { name } }
+          }
+          ... on ProjectV2ItemFieldNumberValue {
+            number
+            field { ... on ProjectV2Field { name } }
+          }
+          ... on ProjectV2ItemFieldIterationValue {
+            title
+            startDate
+            field { ... on ProjectV2IterationField { name } }
+          }
+        }
+      }
+    }
+  }
+}
+
+query PactDigest($login: String!, $number: Int!, $after: String) {
+  organization(login: $login) {
+    projectV2(number: $number) {
+      ...PactProjectItems
+    }
+  }
+  user(login: $login) {
+    projectV2(number: $number) {
+      ...PactProjectItems
     }
   }
 }

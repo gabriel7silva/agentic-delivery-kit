@@ -1,0 +1,25 @@
+{
+  "count": 1,
+  "value": [
+    {
+      "id": 101,
+      "url": "https://dev.azure.com/example-org/Delivery/_apis/wit/workItems/101",
+      "fields": {
+        "System.Id": 101,
+        "System.WorkItemType": "User Story",
+        "System.Title": "Export the list",
+        "System.State": "Awaiting test",
+        "System.BoardColumn": "Awaiting test",
+        "System.IterationPath": "Delivery\\S1",
+        "System.Tags": "needs-human; doc",
+        "System.ChangedDate": "2026-01-16T12:00:00Z",
+        "Custom.PACTRole": "implementer",
+        "Custom.PACTRisk": "low",
+        "Custom.PACTClaim": "app",
+        "Custom.PACTHomolog": "https://example.test/hms/101",
+        "Custom.PACTBranch": "feat/export-list",
+        "Custom.PACTChange": "https://dev.azure.com/example-org/Delivery/_git/delivery/pullrequest/9"
+      }
+    }
+  ]
+}
