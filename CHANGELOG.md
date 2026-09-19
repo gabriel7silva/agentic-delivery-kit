@@ -16,6 +16,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
   `python3 automation/scripts/entry_points.py`.
 
 ### Fixed
+- **GitHub issue templates.** The chooser is Bug, Feature, Issue (blocker)
+  and Task — one frontmatter each, PACT fields, `Resolved ≠ Closed`. The
+  GitHub-default `bug_report` / `feature_request` / empty `custom` are gone;
+  blank issues are off (`config.yml`).
 - **Gate reads the policy.** `validate_pr` applies `agents/policies/gates.yml`
   (`low` → one reviewer) and `core/model/transitions.yml` (human-only
   `Removed`, forbidden pairs). It no longer invents reviewer counts in Python.

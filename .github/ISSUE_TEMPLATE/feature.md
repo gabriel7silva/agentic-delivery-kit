@@ -1,13 +1,4 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
-
----
-
----
 name: Feature
 about: A capability. Closed when the PO accepts it, not when the last Story is Resolved.
 title: "[Feature] "

@@ -206,6 +206,24 @@ def test_folder_runtimes_are_in_the_generator():
         assert rel in paths, rel
 
 
+def test_github_issue_templates_are_pact_forms():
+    """One frontmatter each; kit types; no GitHub-default stubs."""
+    root = Path(__file__).resolve().parents[2] / ".github" / "ISSUE_TEMPLATE"
+    names = {p.stem for p in root.glob("*.md")}
+    assert {"bug", "feature", "issue", "task"} <= names
+    assert "custom" not in names and "bug_report" not in names
+    for path in root.glob("*.md"):
+        text = path.read_text(encoding="utf-8")
+        assert text.startswith("---\n"), path.name
+        closed = text.find("\n---\n", 4)
+        assert closed != -1, path.name
+        body = text[closed + 5 :]
+        assert not body.lstrip().startswith("---"), f"{path.name} has a second frontmatter"
+        assert "PACT" in text or "Resolved" in text, path.name
+    config = (root / "config.yml").read_text(encoding="utf-8")
+    assert "blank_issues_enabled: false" in config
+
+
 def test_every_runtime_pointer_lands_on_agents_md():
     root = Path(__file__).resolve().parents[2]
     assert (root / "AGENTS.md").is_file()
