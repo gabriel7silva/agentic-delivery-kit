@@ -29,6 +29,7 @@ class Pointer:
 
 POINTERS: tuple[Pointer, ...] = (
     Pointer("Claude Code", "CLAUDE.md"),
+    Pointer("Claude Code", ".claude/rules/pact.md"),
     Pointer("Gemini CLI", "GEMINI.md"),
     Pointer("Qwen Code", "QWEN.md"),
     Pointer("Warp", "WARP.md"),
@@ -46,12 +47,19 @@ POINTERS: tuple[Pointer, ...] = (
     Pointer("Amazon Q Developer", ".amazonq/rules/pact.md"),
     Pointer("Trae", ".trae/rules/project_rules.md"),
     Pointer("Augment", ".augment/rules/pact.md", "augment"),
+    Pointer("Hermes Agent", ".hermes.md"),
+    Pointer("Hermes Agent", ".hermes/rules/pact.md"),
+    Pointer("Grok", ".grok/rules/pact.md"),
+    Pointer("Grok Bot", ".grokbot/rules/pact.md"),
+    Pointer("OpenClaw", ".openclaw/rules/pact.md"),
+    Pointer("OpenAI Codex", ".codex/rules/pact.md"),
 )
 
-# Runtimes that read AGENTS.md on their own. Documentary: they need no pointer.
+# Runtimes that read AGENTS.md on their own. Documentary: they still get a
+# folder pointer when that runtime also looks under a dotted directory.
 NATIVE_READERS: tuple[str, ...] = (
     "OpenAI Codex", "Cursor", "GitHub Copilot coding agent", "Google Jules", "Amp", "OpenCode",
-    "Factory", "Zed", "Devin",
+    "Factory", "Zed", "Devin", "Hermes Agent", "Grok", "OpenClaw",
 )
 
 _FRONTMATTER = {

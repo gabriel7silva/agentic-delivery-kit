@@ -192,10 +192,24 @@ def test_instance_topology_must_agree_with_roles(run):
     assert "topology-orchestrator" in out
 
 
+def test_folder_runtimes_are_in_the_generator():
+    paths = {p.path for p in EP.POINTERS}
+    for rel in (
+        ".claude/rules/pact.md",
+        ".hermes.md",
+        ".hermes/rules/pact.md",
+        ".grok/rules/pact.md",
+        ".grokbot/rules/pact.md",
+        ".openclaw/rules/pact.md",
+        ".codex/rules/pact.md",
+    ):
+        assert rel in paths, rel
+
+
 def test_every_runtime_pointer_lands_on_agents_md():
     root = Path(__file__).resolve().parents[2]
     assert (root / "AGENTS.md").is_file()
-    assert len(EP.POINTERS) >= 18
+    assert len(EP.POINTERS) >= 25
     for ptr in EP.POINTERS:
         text = (root / ptr.path).read_text(encoding="utf-8")
         assert "AGENTS.md" in text, ptr.path

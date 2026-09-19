@@ -8,6 +8,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: Se
 
 ## [Unreleased]
 
+### Added
+- **More runtime folders.** Pointers for Claude Code (`.claude/rules/`), Hermes
+  (`.hermes.md` and `.hermes/rules/`), Grok (`.grok/rules/`), Grok Bot
+  (`.grokbot/rules/`), OpenClaw
+  (`.openclaw/rules/`) and OpenAI Codex (`.codex/rules/`). Same template; run
+  `python3 automation/scripts/entry_points.py`.
+
 ### Fixed
 - **Leak denylist file.** `check_leaks` no longer applies the denylist rule to
   `.leakcheck-denylist` or `.leakcheck-denylist.example`, so configuring literal
