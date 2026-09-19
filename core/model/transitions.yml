@@ -1,0 +1,102 @@
+# Allowed transitions and what each one requires.
+# Canon: RULE-STATES · RULE-STATE-CATEGORIES · RULE-TRANSITION-BARRIER · RULE-REVIEW-GATE · RULE-CLAIM
+#
+# Transitions are written between CATEGORIES (item-states.yml → categories). A move
+# between two states of the same category needs no gate beyond `set_by`; a move that
+# crosses a category boundary goes through the row for that pair. The PR validator
+# normalises a state id to its category before it checks.
+#
+# `requires` names evidence types from review-gates.yml (`evidence_types`) or
+# model-level facts. The PR validator checks the ones it can see; a track
+# without a validator checks them by hand, but checks.
+
+version: 1
+
+transitions:
+  - from: NEW
+    to: ACTIVE
+    by: [orchestrator]
+    requires:
+      - DOR_SATISFIED            # every Definition of Ready line checked
+      - HANDOFF                  # a handoff exists for the item
+      - CLAIM_OPEN               # a scope claim recorded in the source of truth
+
+  - from: ACTIVE
+    to: RESOLVED
+    by: [implementer, orchestrator]
+    requires:
+      - VERIFICATION_PASSED      # instance verification_commands green
+      - REVIEW_GATE_PASSED       # required reviewers returned verdicts; no blocking finding
+      - RISK_GATE_SATISFIED      # what the computed risk level demands (RULE-RISK-GATES)
+      - RECEIPT                  # templates/flow/receipt.md, incl. "Not verified / not claimed"
+      - CONCLUSION_COMMENT       # six fields, on the item
+      - CLAIM_RELEASED
+
+  - from: RESOLVED
+    to: CLOSED
+    by: [approver, product_owner]
+    human_only: true
+    requires:
+      - HUMAN_ACCEPTANCE         # recorded on the item, in writing
+      - HUMAN_GATE_IF_HIGH       # a named human reviewed before RESOLVED when risk == high
+      - HOMOLOG_READY            # when require_homologation_qa — QA started the env and linked branch + URL
+      - KEY_USER_UPDATE          # when require_homologation_qa — key user tested there and wrote for the PO
+
+  - from: RESOLVED
+    to: ACTIVE                   # rejection — lands on IN_DEVELOPMENT
+    by: [approver, product_owner, qa, key_user]
+    human_only: true
+    requires:
+      - REJECTION_NOTE           # one objective note: which AC, what would satisfy it (RULE-STATE-REJECT)
+
+  - from: ACTIVE
+    to: NEW                      # return — the sprint close sends unfinished work back to the backlog
+    by: [product_owner, orchestrator]
+    requires:
+      - RETURN_REASON            # the carry-over decision and its reason, on the item (RULE-CARRY-OVER)
+      - CLAIM_RELEASED
+
+  - from: NEW
+    to: REMOVED
+    by: [product_owner]
+    human_only: true
+    requires:
+      - REMOVAL_REASON
+
+  - from: ACTIVE
+    to: REMOVED
+    by: [product_owner]
+    human_only: true
+    requires:
+      - REMOVAL_REASON
+      - CLAIM_RELEASED
+
+within_category:
+  # Free moves, by whoever may set the target state (item-states.yml → set_by).
+  # Listed so a track can lay out its board and a reader can see the default path.
+  NEW: [NEW, IN_ANALYSIS, AWAITING_DEVELOPMENT]
+  ACTIVE: [IN_DEVELOPMENT, BLOCKED]
+  RESOLVED: [AWAITING_TEST, PREPARE_HOMOLOGATION, KEY_USER_HOMOLOGATION, PREPARE_RELEASE, INTEGRATION_TEST]
+  CLOSED: [CLOSED]
+  REMOVED: [REMOVED]
+
+state_entry:
+  # What a specific state needs on entry, on top of its category's transition.
+  # Documentary for the board; the PR validator binds them at CLOSED (validate_pr.py).
+  PREPARE_HOMOLOGATION: [REVIEW_GATE_PASSED]     # never before Check review — AP-HOMOLOG-BEFORE-REVIEW
+  KEY_USER_HOMOLOGATION: [HOMOLOG_READY]         # BRANCH + HOMOLOG_LINK on the board, env up
+  PREPARE_RELEASE: [KEY_USER_UPDATE]             # when require_homologation_qa; plus Transfer review acceptance
+  INTEGRATION_TEST: [HUMAN_ACCEPTANCE]           # publication is a human gate (RULE-HITL trigger 2)
+
+forbidden:
+  # Listed so that a validator can name the specific violation.
+  - from: "*"
+    to: CLOSED
+    by: [implementer, reviewer, orchestrator, qa, key_user]
+    reason: RULE-STATE-RESOLVED-NOT-CLOSED — an agent (or an instance hat) never sets Closed
+  - from: NEW
+    to: RESOLVED
+    reason: Nothing was executed; there is no evidence to resolve on
+  - from: CLOSED
+    to: "*"
+    reason: Closed is terminal. Reopen by creating a linked Bug or Story

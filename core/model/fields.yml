@@ -1,0 +1,143 @@
+# Every field the method needs on a work item.
+# Canon: RULE-TWO-AXES · RULE-CLAIM · RULE-RISK · RULE-CONCLUSION-COMMENT
+#
+# `required_by` names the rule that needs the field; a track that cannot provide
+# a field must declare a substitute for it (tracks/_contract). Whether a field
+# is native to a tool is the track's knowledge, not the model's.
+
+version: 1
+
+fields:
+  - id: ITEM_ID
+    name: Item id
+    type: string
+    required_by: RULE-GOLDEN-TRACE
+    note: Stable, human-readable. May be the tool's own id or a semantic code
+
+  - id: ITEM_TYPE
+    name: Work item type
+    type: single_select
+    values_from: item-types.yml
+    required_by: RULE-ITEM-MODEL
+
+  - id: WI_STATE
+    name: WI-State
+    type: single_select
+    values_from: item-states.yml
+    required_by: RULE-STATES
+
+  - id: STATUS
+    name: Status
+    type: single_select
+    values_from: board-columns.yml
+    required_by: RULE-TWO-AXES
+    note: The board column. Distinct from WI_STATE by design
+
+  - id: PARENT
+    name: Parent
+    type: reference
+    required_by: RULE-ITEM-MODEL
+    note: Native hierarchy where the tool has it; a text field holding the parent's ITEM_ID otherwise
+
+  - id: ITERATION
+    name: Iteration
+    type: reference
+    values_from: iterations.yml
+    required_by: RULE-CEREMONIES
+
+  - id: PRIORITY
+    name: Priority
+    type: single_select
+    values: [P1, P2, P3, P4]
+    required_by: RULE-CEREMONY-REFINEMENT
+
+  - id: ROLE
+    name: Role / skill
+    type: single_select
+    required_by: RULE-DOR
+    note: Which role executes. Values come from instance.yml roles, never from a vendor list
+
+  - id: RISK
+    name: Risk
+    type: single_select
+    values: [low, medium, high]
+    required_by: RULE-RISK
+    note: The computed MAX(verdict, floor). Set at the review gate, read at the human gate
+
+  - id: CLAIM
+    name: Scope claim
+    type: text
+    required_by: RULE-CLAIM
+    note: Lives here, in the source of truth, never in a repository file
+
+  - id: BRANCH
+    name: Branch
+    type: string
+    required_by: RULE-GOLDEN-TRACE
+    note: The feature branch of this item, on the board field the track maps. Never the default branch. A name written only in the description is not this field.
+
+  - id: CHANGE_LINK
+    name: Change / pull request
+    type: url
+    required_by: RULE-MERGE-COMMON
+    note: The pull request URL on the board field. Empty until the PR exists and is linked.
+
+  - id: HOMOLOG_LINK
+    name: Homologation environment
+    type: url
+    required_by: RULE-HOMOLOG-READY
+    note: URL of the running homologation environment for this item's feature branch. QA writes it after starting the environment. The key user tests there. Empty until QA starts it.
+
+  - id: START_DATE
+    name: Start date
+    type: date
+    required_by: RULE-GOLDEN-TRACE
+    note: The day WI-State becomes Active. Typed on the board field; nothing defaults it.
+
+  - id: TARGET_DATE
+    name: Target date
+    type: date
+    required_by: RULE-CEREMONY-PLANNING
+    note: Set in Planning, required before Ready. Typed on the board field; nothing defaults it.
+
+  - id: TAGS
+    name: Tags
+    type: multi_select
+    default_values: [needs-human, spike, gap, improvement, tooling, doc, qa, ceremony]
+    required_by: RULE-HITL
+    note: needs-human is the one tag every instance must keep
+
+  - id: RETRO
+    name: Retrospective note
+    type: text
+    required_by: RULE-CEREMONY-RETRO
+    optional: true
+
+  # ── optional fields — present when the instance turns the rule on ─────────────
+  - id: EFFORT
+    name: Effort
+    type: number
+    required_by: RULE-OPT-SPRINT-METRICS
+    optional: true
+    note: Relative size (points) or hours at Story or Feature level, set in Refinement or Planning. The method still sizes by "fits one handoff" (RULE-DOD); this is for capacity and reporting
+
+  - id: REMAINING_WORK
+    name: Remaining work
+    type: number
+    required_by: RULE-OPT-SPRINT-METRICS
+    optional: true
+    note: Hours left on a Task, updated by whoever executes it. Drives the iteration burndown
+
+  - id: BUSINESS_VALUE
+    name: Business value
+    type: number
+    required_by: RULE-OPT-SPRINT-METRICS
+    optional: true
+    note: Relative value at Epic or Feature level, set by the PO. Orders the backlog together with PRIORITY
+
+  - id: EXTERNAL_REF
+    name: External reference
+    type: string
+    required_by: RULE-OPT-EXTERNAL-REF
+    optional: true
+    note: The id of the request in another system — a service desk ticket, a contract line, an incident. Also carried in the title as "[<ref>] <title>" so it survives every view. ITEM_ID stays the id of record

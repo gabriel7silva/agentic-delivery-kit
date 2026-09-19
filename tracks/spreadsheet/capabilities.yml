@@ -1,0 +1,25 @@
+# Spreadsheet — what the tool can do. Schema: schemas/capabilities.schema.json
+#
+# HOSTED spreadsheet only (a workbook in a shared drive or an online spreadsheet with version
+# history and comments). A file on a disk has neither history nor attributable comments and
+# cannot be the source of truth — that is the instance's responsibility to respect.
+version: 1
+track: spreadsheet
+
+capabilities:
+  sot_eligible: true           # hosted with version history and comments — see notes
+  durable_history: true        # version history of the workbook, attributable per edit
+  custom_fields: true          # a column is a field; data validation is the picklist
+  native_hierarchy: false      # a Parent column is not a tree
+  comments: true               # row / cell comments, dated and attributable, plus a Comments sheet
+  attachments: false           # links only; files live in the code host or a document store
+  code_review: false           # no change-request object
+  ci: false                    # no verification runner
+  iteration_native: false      # an Iterations sheet with dates, no first-class sprint
+  automation_hooks: true       # the spreadsheet's script or automation platform can react to edits
+  queries: true                # filters and filter views
+
+notes:
+  sot_eligible: Only when the workbook is hosted where every edit is versioned and attributable. Write that constraint into the instance; the kit cannot check where your file lives.
+  comments: A cell comment holds a short note; the six-field conclusion comment goes in the Comments sheet, one row per comment, with a cell comment pointing at the row.
+  automation_hooks: Enough to post a digest or notify a channel from a script; not enough to enforce a state rule.

@@ -1,0 +1,178 @@
+# Azure DevOps — neutral symbol → tool. Schema: schemas/mapping.schema.json
+# Process template assumed: Agile (Basic and Scrum differ in type names; see fields.md).
+
+version: 1
+track: azure-devops
+
+symbols:
+  # ── entities ──────────────────────────────────────────────────────────────
+  ITEM:
+    kind: native
+    as: Work Item
+  ITEM_PARENT:
+    kind: native
+    as: Parent/Child link
+    note: Real hierarchy; the Backlogs view renders it as a tree
+  ITERATION:
+    kind: native
+    as: Iteration Path
+    note: Has start and end dates; the item's Iteration Path field assigns it
+  CLAIM:
+    kind: custom
+    as: PACT.Claim
+    how: Add a Text (multi-line) field "PACT.Claim" to User Story, Task and Bug via Process → Fields; the claim and release blocks are pasted there
+  REVIEW_GATE:
+    kind: native
+    as: Pull request required reviewers + branch policy
+    note: policies.md shows the branch policy that implements RULE-REVIEW-GATE
+  CHANGE_REQUEST:
+    kind: native
+    as: Pull request (Azure Repos)
+  EVIDENCE_LINK:
+    kind: native
+    as: Attachment or Link on the work item
+  CONCLUSION_COMMENT:
+    kind: native
+    as: Discussion comment on the work item
+  CEREMONY_MINUTES:
+    kind: custom
+    as: Wiki page under /PACT/minutes
+    how: Project Wiki; one page per ceremony, linked from the iteration
+  DIGEST:
+    kind: custom
+    as: Dashboard widget or a scheduled query e-mail
+    how: A Query "Daily digest" (queries/digest.wiql) rendered in a Dashboard, or sent by a pipeline
+
+  # ── item types ────────────────────────────────────────────────────────────
+  EPIC:
+    kind: native
+    as: Epic
+  FEATURE:
+    kind: native
+    as: Feature
+  STORY:
+    kind: native
+    as: User Story
+    note: "Scrum process: Product Backlog Item. Basic process: Issue (rename recommended)"
+  TASK:
+    kind: native
+    as: Task
+  BUG:
+    kind: native
+    as: Bug
+  ISSUE:
+    kind: native
+    as: Impediment
+    note: "Agile process calls it Issue; Scrum calls it Impediment. Both are outside the hierarchy"
+
+  # ── WI-States → native State ──────────────────────────────────────────────
+  WI_STATE:
+    kind: native
+    as: State
+    how: Custom states on the inherited process, each in the Azure state category that matches its PACT category (Proposed = NEW, In Progress = ACTIVE, Resolved = RESOLVED, Completed = CLOSED, Removed = REMOVED) — setup step 4
+    values:
+      NEW: New
+      IN_ANALYSIS: In analysis
+      AWAITING_DEVELOPMENT: Awaiting development
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      CLOSED: Closed
+      REMOVED: Removed
+    note: An instance that runs fewer states (instance.yml → lifecycle) creates only those, at least one per category. Task lacks the Resolved category by default — add it
+
+  # ── board columns → Board Column ──────────────────────────────────────────
+  STATUS:
+    kind: native
+    as: Board Column
+    values:
+      BACKLOG: Backlog
+      IN_ANALYSIS: In analysis
+      READY: Ready
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      DONE: Done
+    note: Columns are configured per backlog level (setup step 5), one per state in the order of core/model/board-columns.yml. "Done" maps to State Closed only
+
+  # ── fields ────────────────────────────────────────────────────────────────
+  ITEM_ID:
+    kind: native
+    as: ID
+    note: The numeric work-item ID. Add a "PACT.Code" text field if you want semantic ids like US-1.1
+  ITEM_TYPE:
+    kind: native
+    as: Work Item Type
+  PARENT:
+    kind: native
+    as: Parent (link)
+  PRIORITY:
+    kind: native
+    as: Priority
+    values:
+      P1: "1"
+      P2: "2"
+      P3: "3"
+      P4: "4"
+  ROLE:
+    kind: custom
+    as: PACT.Role
+    how: Picklist field; values from instance.yml roles (product_owner, orchestrator, implementer, reviewer, approver)
+  RISK:
+    kind: custom
+    as: PACT.Risk
+    how: Picklist field with values low / medium / high; set by the review gate
+  BRANCH:
+    kind: native
+    as: Development (linked branch)
+    how: Create or link the branch from the work item. A branch that only exists in the repo does not appear here.
+    note: Not automatic unless the branch or PR is created from the item or mentions it
+  CHANGE_LINK:
+    kind: native
+    as: Development (linked pull request)
+    how: Link the PR to the work item, or mention the id in the PR
+  START_DATE:
+    kind: native
+    as: Start Date
+    how: Type it the day WI-State becomes Active
+    note: Native on Feature and Epic; add to User Story if you want it there
+  TARGET_DATE:
+    kind: native
+    as: Target Date
+    how: Type it in Planning, before Ready
+  HOMOLOG_LINK:
+    kind: custom
+    as: PACT.Homolog
+    how: URL or text field. QA pastes the running environment URL after starting it for this item's feature branch. The key user tests that URL.
+  TAGS:
+    kind: native
+    as: Tags
+  RETRO:
+    kind: custom
+    as: PACT.Retro
+    how: Text (multi-line) field, optional
+
+  # ── optional fields: sprint metrics and external reference ────────────────
+  EFFORT:
+    kind: native
+    as: Story Points (Agile) / Effort (Scrum, Basic)
+    note: Shown on the card and summed in the sprint views when track_sprint_metrics is on
+  REMAINING_WORK:
+    kind: native
+    as: Remaining Work
+    note: On Task; the Taskboard and the burndown read it
+  BUSINESS_VALUE:
+    kind: native
+    as: Business Value
+  EXTERNAL_REF:
+    kind: custom
+    as: PACT.ExternalRef
+    how: Text (single line) on User Story, Feature, Bug; the title also starts with "[<ref>]"

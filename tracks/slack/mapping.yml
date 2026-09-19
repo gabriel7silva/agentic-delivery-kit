@@ -1,0 +1,203 @@
+# Slack — neutral symbol → tool. Schema: schemas/mapping.schema.json
+#
+# Slack is a MIRROR. Every "custom" below describes how the mirror shows the
+# symbol; every "unsupported" says where the real thing lives (the SoT track).
+
+version: 1
+track: slack
+
+symbols:
+  # ── entities ──────────────────────────────────────────────────────────────
+  ITEM:
+    kind: custom
+    as: Slack List item (mirror) + its thread
+    how: A List "Work items" with one item per SoT item; the SoT id in a text field; the thread under the item's announcement carries discussion
+  ITEM_PARENT:
+    kind: unsupported
+    substitute:
+      mechanism: Text field "Parent" holding the parent's SoT id
+      evidence: The field, mirrored from the SoT
+      loses: Tree view and roll-ups; read them in the SoT
+  ITERATION:
+    kind: unsupported
+    substitute:
+      mechanism: One channel per iteration, named from the iteration name, or a List select field "Iteration"; dates live in the SoT
+      evidence: The channel's pinned Planning digest
+      loses: Dates, burndown, everything that needs an entity
+  CLAIM:
+    kind: unsupported
+    substitute:
+      mechanism: The claim lives in the SoT (RULE-CLAIM). Slack posts the claim and release EVENTS (event-formats/item-event.md) so humans see them
+      evidence: The SoT field; the Slack message is a notification
+      loses: Nothing — this is the intended design
+  REVIEW_GATE:
+    kind: unsupported
+    substitute:
+      mechanism: The gate is in the code host. Slack shows the request in a thread; a reviewer's reaction is a signal that they posted their verdict THERE, not the verdict itself
+      evidence: The verdict on the change request in the code host, linked in the thread
+      loses: Nothing if the code host enforces; everything if people treat the reaction as the review
+  CHANGE_REQUEST:
+    kind: unsupported
+    substitute:
+      mechanism: A link in the item's thread and a URL field on the List item
+      evidence: The URL
+      loses: Nothing
+  EVIDENCE_LINK:
+    kind: unsupported
+    substitute:
+      mechanism: Files posted in a thread are COPIED to the SoT item; the thread keeps a link back
+      evidence: The attachment on the SoT item
+      loses: Retention and searchability if the copy is skipped — so it is never skipped
+  CONCLUSION_COMMENT:
+    kind: unsupported
+    substitute:
+      mechanism: Posted in the item's thread AND on the SoT item; the Slack copy links to the SoT copy
+      evidence: The SoT comment
+      loses: Nothing while both exist; the Slack copy alone is not evidence
+  CEREMONY_MINUTES:
+    kind: custom
+    as: Canvas in the ceremony channel, mirrored to the SoT
+    how: One canvas per ceremony from templates/ceremonies/; the SoT copy is canonical
+  DIGEST:
+    kind: native
+    as: Scheduled message from Workflow Builder or a bot
+    note: The one symbol Slack does best. Format in event-formats/digest.md
+
+  # ── item types → List select ──────────────────────────────────────────────
+  EPIC:
+    kind: custom
+    as: List select "Type" = Epic
+    how: Select field on the List
+  FEATURE:
+    kind: custom
+    as: List select "Type" = Feature
+    how: Same
+  STORY:
+    kind: custom
+    as: List select "Type" = Story
+    how: Same
+  TASK:
+    kind: custom
+    as: List select "Type" = Task
+    how: Same
+  BUG:
+    kind: custom
+    as: List select "Type" = Bug
+    how: Same
+  ISSUE:
+    kind: custom
+    as: List select "Type" = Issue
+    how: Same
+
+  # ── WI-State → List select (mirror) ───────────────────────────────────────
+  WI_STATE:
+    kind: custom
+    as: List select "WI-State" (mirror of the SoT)
+    how: Select field; updated by the sync, never by hand
+    values:
+      NEW: New
+      IN_ANALYSIS: In analysis
+      AWAITING_DEVELOPMENT: Awaiting development
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      CLOSED: Closed
+      REMOVED: Removed
+
+  # ── board columns → List select (mirror) ─────────────────────────────────
+  STATUS:
+    kind: custom
+    as: List select "Status" (mirror)
+    how: Select field
+    values:
+      BACKLOG: Backlog
+      IN_ANALYSIS: In analysis
+      READY: Ready
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      DONE: Done
+
+  # ── fields ────────────────────────────────────────────────────────────────
+  ITEM_ID:
+    kind: custom
+    as: Text field "SoT id"
+    how: Text field holding the source-of-truth id
+  ITEM_TYPE:
+    kind: custom
+    as: List select "Type"
+    how: See item types
+  PARENT:
+    kind: unsupported
+    substitute:
+      mechanism: Text field "Parent" with the parent's SoT id
+      evidence: The field
+      loses: Hierarchy
+  PRIORITY:
+    kind: custom
+    as: List select "Priority"
+    how: Options P1–P4
+  ROLE:
+    kind: custom
+    as: List select "Role"
+    how: Options from instance.yml roles
+  RISK:
+    kind: custom
+    as: List select "Risk"
+    how: Options low / medium / high; mirrored
+  BRANCH:
+    kind: custom
+    as: Text field "Branch"
+    how: Text field
+  CHANGE_LINK:
+    kind: custom
+    as: Link field "Change"
+    how: Link field
+  START_DATE:
+    kind: custom
+    as: Date field "Start"
+    how: Date field
+  TARGET_DATE:
+    kind: custom
+    as: Date field "Target"
+    how: Date field
+  HOMOLOG_LINK:
+    kind: custom
+    as: Link field "Homologation"
+    how: Mirrored from the SoT. QA writes it there; the key user tests that URL.
+  TAGS:
+    kind: custom
+    as: Multi-select "Tags"
+    how: Multi-select field
+  RETRO:
+    kind: unsupported
+    substitute:
+      mechanism: Lives in the SoT only
+      evidence: The SoT field
+      loses: Nothing
+
+  # ── optional fields: sprint metrics and external reference (mirror) ───────
+  EFFORT:
+    kind: custom
+    as: List number field "Effort" (mirror)
+    how: Mirrored from the SoT
+  REMAINING_WORK:
+    kind: custom
+    as: List number field "Remaining" (mirror)
+    how: Mirrored from the SoT
+  BUSINESS_VALUE:
+    kind: custom
+    as: List number field "Value" (mirror)
+    how: Mirrored from the SoT
+  EXTERNAL_REF:
+    kind: custom
+    as: List text field "External ref" (mirror)
+    how: Mirrored from the SoT

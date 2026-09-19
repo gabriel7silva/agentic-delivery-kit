@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/mapping.schema.json",
+  "title": "PACT track mapping",
+  "description": "tracks/<name>/mapping.yml — how one tool represents every neutral symbol. Coverage (100 % of symbols) is checked by check_mapping.py, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "track", "symbols"],
+  "properties": {
+    "version": { "const": 1 },
+    "track": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "symbols": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[A-Z][A-Z0-9_]*$" },
+      "additionalProperties": { "$ref": "#/$defs/symbolMapping" }
+    }
+  },
+  "$defs": {
+    "symbolMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["native", "custom", "unsupported"] },
+        "as": { "type": "string", "description": "What the tool calls it (native/custom)." },
+        "values": {
+          "type": "object",
+          "description": "For select-like symbols: neutral value → tool value.",
+          "additionalProperties": { "type": ["string", "null"] }
+        },
+        "how": { "type": "string", "description": "How to create or configure it (custom)." },
+        "substitute": {
+          "type": "object",
+          "description": "Mandatory when kind is unsupported.",
+          "additionalProperties": false,
+          "required": ["mechanism", "evidence"],
+          "properties": {
+            "mechanism": { "type": "string", "minLength": 1 },
+            "evidence": { "type": "string", "minLength": 1 },
+            "loses": { "type": "string" }
+          }
+        },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "unsupported" } } },
+          "then": { "required": ["substitute"] }
+        },
+        {
+          "if": { "properties": { "kind": { "enum": ["native", "custom"] } } },
+          "then": { "required": ["as"] }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,69 @@
+# Scope ownership — "N readers, one writer" as data. Schema: schemas/ownership.schema.json
+# Canon: RULE-SCOPE · RULE-SINGLE-WRITER · RULE-RISK
+#
+# A scope is a set of path globs with exactly ONE writer and the reviewers every
+# change under it must pass. Matching is most-specific-first: a path that matches
+# two scopes belongs to the one with the longest matching glob, so `src/storage/**`
+# wins over `src/**`. Two scopes with an identical glob are a configuration error.
+#
+# These scopes are a STARTING POINT for a typical application repository. Replace
+# the globs with yours; keep the shape. Changing this file is itself a high-risk
+# change (agents/README.md).
+
+version: 1
+
+default_scope:
+  # Anything no scope matches. Conservative on purpose.
+  writer: implementer
+  reviewers: [reviewer-correctness, reviewer-delivery-compliance]
+  floor: medium
+
+scopes:
+  - id: docs
+    description: Documentation, minutes, receipts, changelog
+    paths: ["docs/**", "*.md", "CHANGELOG.md"]
+    writer: implementer
+    reviewers: [reviewer-docs, reviewer-delivery-compliance]
+    floor: low
+
+  - id: tests
+    description: Test code and fixtures
+    paths: ["tests/**", "test/**", "**/*_test.*", "**/*.test.*", "**/fixtures/**"]
+    writer: implementer
+    reviewers: [reviewer-correctness]
+    floor: low
+
+  - id: app
+    description: Application code with no trust boundary
+    paths: ["src/**", "app/**", "lib/**"]
+    writer: implementer
+    reviewers: [reviewer-correctness, reviewer-delivery-compliance]
+    floor: medium
+
+  - id: data-boundary
+    description: Code that reads or writes user data — disk, network, database
+    paths: ["src/storage/**", "src/net/**", "src/db/**", "migrations/**", "app/storage/**", "app/net/**"]
+    writer: implementer
+    reviewers: [reviewer-correctness, reviewer-security, reviewer-delivery-compliance]
+    floor: high
+
+  - id: security-config
+    description: Permissions, policies, CI definitions, anything that decides what may run
+    paths: ["config/permissions/**", "**/*.policy.*", ".github/workflows/**", "ci/**", "pipelines/**"]
+    writer: implementer
+    reviewers: [reviewer-security, reviewer-delivery-compliance]
+    floor: high
+
+  - id: schemas
+    description: Schemas of anything persisted or exchanged with another party
+    paths: ["schemas/**", "**/*.schema.*", "api/**/*.yaml", "api/**/*.json"]
+    writer: implementer
+    reviewers: [reviewer-correctness, reviewer-security]
+    floor: high
+
+  - id: method
+    description: The delivery method's own policy — floors, ownership, roster
+    paths: ["agents/**", "instance.yml"]
+    writer: implementer
+    reviewers: [reviewer-security, reviewer-delivery-compliance]
+    floor: high

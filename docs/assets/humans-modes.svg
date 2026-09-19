@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" role="img" aria-label="Two operating modes, same method. Supervised: a human pastes prompts. Unattended: a coding CLI on a VM opens the PR. The validator binds the context it is given. Both stop at Transfer; only a human sets Closed.">
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      animate, animateTransform, animateMotion { display: none; }
+    }
+  </style>
+  <defs>
+    <marker id="hm-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3fb950"/></marker>
+    <marker id="hm-o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f0883e"/></marker>
+    <filter id="hm-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <path id="hm-top" d="M90,92 L230,92 L390,92 L560,92 L730,92 L860,92"/>
+    <path id="hm-bot" d="M90,208 L230,208 L390,208 L560,208 L730,208 L860,208"/>
+  </defs>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+    <text x="40" y="28" font-size="13" fill="#8b949e" letter-spacing="2" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SAME ROLES · TWO MODES</text>
+    <text x="920" y="28" text-anchor="end" font-size="13" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Transfer is always human</text>
+
+    <text x="40" y="54" font-size="12" fill="#3fb950" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SUPERVISED</text>
+    <g font-size="12" text-anchor="middle">
+      <rect x="40" y="64" width="100" height="56" rx="10" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="90" y="88" fill="#8b949e" font-weight="700">PO</text>
+      <text x="90" y="106" fill="#8b949e" font-size="11">writes the card</text>
+
+      <line x1="140" y1="92" x2="188" y2="92" stroke="#8b949e" stroke-width="2" marker-end="url(#hm-g)"/>
+
+      <rect x="196" y="64" width="110" height="56" rx="10" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <text x="251" y="88" fill="#3fb950" font-weight="700">chat</text>
+      <text x="251" y="106" fill="#8b949e" font-size="11">prompt pack</text>
+
+      <line x1="306" y1="92" x2="354" y2="92" stroke="#8b949e" stroke-width="2" marker-end="url(#hm-g)"/>
+
+      <rect x="362" y="64" width="110" height="56" rx="10" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <text x="417" y="88" fill="#3fb950" font-weight="700">implementer</text>
+      <text x="417" y="106" fill="#8b949e" font-size="11">one scope</text>
+
+      <line x1="472" y1="92" x2="520" y2="92" stroke="#8b949e" stroke-width="2" marker-end="url(#hm-g)"/>
+
+      <rect x="528" y="64" width="110" height="56" rx="10" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="583" y="88" fill="#8b949e" font-weight="700">reviewers</text>
+      <text x="583" y="106" fill="#8b949e" font-size="11">read-only</text>
+
+      <line x1="638" y1="92" x2="686" y2="92" stroke="#f0883e" stroke-width="2" marker-end="url(#hm-o)"/>
+
+      <rect x="694" y="64" width="140" height="56" rx="10" fill="none" stroke="#f0883e" stroke-width="2.5">
+        <animate attributeName="stroke-opacity" values="1;0.45;1" dur="2.4s" repeatCount="indefinite"/>
+      </rect>
+      <text x="764" y="88" fill="#f0883e" font-weight="700">Approver</text>
+      <text x="764" y="106" fill="#8b949e" font-size="11">sets Closed</text>
+    </g>
+
+    <text x="40" y="170" font-size="12" fill="#3fb950" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">UNATTENDED</text>
+    <g font-size="12" text-anchor="middle">
+      <rect x="40" y="180" width="100" height="56" rx="10" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="90" y="204" fill="#8b949e" font-weight="700">PO</text>
+      <text x="90" y="222" fill="#8b949e" font-size="11">still human</text>
+
+      <line x1="140" y1="208" x2="188" y2="208" stroke="#8b949e" stroke-width="2" marker-end="url(#hm-g)"/>
+
+      <rect x="196" y="180" width="110" height="56" rx="10" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <text x="251" y="204" fill="#3fb950" font-weight="700">CLI on a VM</text>
+      <text x="251" y="222" fill="#8b949e" font-size="11">bot pulls Ready</text>
+
+      <line x1="306" y1="208" x2="354" y2="208" stroke="#8b949e" stroke-width="2" marker-end="url(#hm-g)"/>
+
+      <rect x="362" y="180" width="110" height="56" rx="10" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <text x="417" y="204" fill="#3fb950" font-weight="700">PR + claim</text>
+      <text x="417" y="222" fill="#8b949e" font-size="11">one writer</text>
+
+      <line x1="472" y1="208" x2="520" y2="208" stroke="#8b949e" stroke-width="2" marker-end="url(#hm-g)"/>
+
+      <rect x="528" y="180" width="110" height="56" rx="10" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="583" y="204" fill="#8b949e" font-weight="700">validator</text>
+      <text x="583" y="222" fill="#8b949e" font-size="11">binds context</text>
+
+      <line x1="638" y1="208" x2="686" y2="208" stroke="#f0883e" stroke-width="2" marker-end="url(#hm-o)"/>
+
+      <rect x="694" y="180" width="140" height="56" rx="10" fill="none" stroke="#f0883e" stroke-width="2.5">
+        <animate attributeName="stroke-opacity" values="1;0.45;1" dur="2.4s" begin="0.4s" repeatCount="indefinite"/>
+      </rect>
+      <text x="764" y="204" fill="#f0883e" font-weight="700">Approver</text>
+      <text x="764" y="222" fill="#8b949e" font-size="11">sets Closed</text>
+    </g>
+
+    <circle r="6" fill="#3fb950" filter="url(#hm-glow)">
+      <animateMotion dur="6s" repeatCount="indefinite"><mpath href="#hm-top"/></animateMotion>
+      <animate attributeName="fill" values="#3fb950;#3fb950;#3fb950;#f0883e;#f0883e" keyTimes="0;0.5;0.7;0.85;1" dur="6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="6" fill="#3fb950" filter="url(#hm-glow)">
+      <animateMotion dur="6s" begin="0.35s" repeatCount="indefinite"><mpath href="#hm-bot"/></animateMotion>
+      <animate attributeName="fill" values="#3fb950;#3fb950;#3fb950;#f0883e;#f0883e" keyTimes="0;0.5;0.7;0.85;1" dur="6s" begin="0.35s" repeatCount="indefinite"/>
+    </circle>
+
+    <text x="480" y="272" text-anchor="middle" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the kit does not start the CLI or the VM · it is the method those bots run under</text>
+    <text x="480" y="290" text-anchor="middle" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Grok · Codex · IDE agents · any terminal coding agent — examples of the class, not dependencies</text>
+  </g>
+</svg>

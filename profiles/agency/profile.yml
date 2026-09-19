@@ -1,0 +1,16 @@
+# Agency profile — you deliver for an external customer.
+version: 1
+profile: agency
+
+optional_rules:
+  require_client_signoff: true       # RULE-OPT-CLIENT-SIGNOFF — acceptance is a signed artifact
+  require_changelog_entry: true      # the customer reads it
+  require_iteration_report: true     # RULE-OPT-ITERATION-REPORT — the status report is built from it
+  require_homologation_qa: true      # QA starts the env and links it; the key user tests and updates the PO
+
+defaults:
+  roles:
+    approver:
+      title: Client Approver
+    product_owner:
+      title: Delivery Lead

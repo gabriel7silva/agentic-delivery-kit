@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/model.schema.json",
+  "title": "PACT neutral model",
+  "description": "Validates core/model/*.yml. check_schemas.py picks the $defs entry by file name.",
+  "$defs": {
+    "item-types": {
+      "type": "object",
+      "required": ["version", "types", "hierarchy"],
+      "properties": {
+        "version": { "const": 1 },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "represents", "parent", "carried_by", "agent_may_close"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "parent": { "type": "array", "items": { "type": "string" } },
+              "agent_may_close": { "type": "boolean" },
+              "executable": { "type": "boolean" }
+            }
+          }
+        },
+        "hierarchy": { "type": "array", "items": { "type": "array", "minItems": 2, "maxItems": 2 } }
+      }
+    },
+    "item-states": {
+      "type": "object",
+      "required": ["version", "categories", "states", "default_path", "pact_phases"],
+      "properties": {
+        "categories": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "pact_phase", "meaning"],
+            "properties": {
+              "id": { "type": "string", "enum": ["NEW", "ACTIVE", "RESOLVED", "CLOSED", "REMOVED"] },
+              "human_only": { "type": "boolean" }
+            }
+          }
+        },
+        "states": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "category", "meaning", "set_by", "counts_as_delivered"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "category": { "type": "string", "enum": ["NEW", "ACTIVE", "RESOLVED", "CLOSED", "REMOVED"] },
+              "set_by": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "human_only": { "type": "boolean" },
+              "counts_as_delivered": { "type": "boolean" }
+            }
+          }
+        },
+        "default_path": { "type": "array", "minItems": 2, "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" } }
+      }
+    },
+    "transitions": {
+      "type": "object",
+      "required": ["version", "transitions", "forbidden"],
+      "properties": {
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "by", "requires"],
+            "properties": {
+              "requires": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" } }
+            }
+          }
+        }
+      }
+    },
+    "board-columns": {
+      "type": "object",
+      "required": ["version", "columns", "translation", "hidden_states"],
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "from_state"],
+            "properties": { "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" } }
+          }
+        }
+      }
+    },
+    "iterations": {
+      "type": "object",
+      "required": ["version", "entity", "naming", "cadence"],
+      "properties": {
+        "naming": {
+          "type": "object",
+          "required": ["pattern", "sequence_resets", "placeholders"],
+          "properties": {
+            "pattern": { "type": "string", "minLength": 1 },
+            "sequence_resets": { "type": "string", "enum": ["year", "quarter", "never"] },
+            "placeholders": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["id", "meaning"],
+                "properties": {
+                  "id": { "type": "string", "pattern": "^[a-z]+$" },
+                  "meaning": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        "cadence": {
+          "type": "object",
+          "properties": {
+            "sprint_close": {
+              "type": "object",
+              "properties": { "order": { "type": "array", "minItems": 1, "items": { "type": "string" } } }
+            }
+          }
+        }
+      }
+    },
+    "fields": {
+      "type": "object",
+      "required": ["version", "fields"],
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "type", "required_by"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "type": { "type": "string", "enum": ["string", "text", "url", "date", "number", "reference", "single_select", "multi_select"] },
+              "optional": { "type": "boolean" },
+              "required_by": { "type": "string", "pattern": "^RULE-" }
+            }
+          }
+        }
+      }
+    },
+    "review-gates": {
+      "type": "object",
+      "required": ["version", "gates", "verdict_shape", "evidence_types", "risk_levels"]
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["version", "capabilities"],
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "question"],
+            "properties": { "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" } }
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "required": ["version", "rules"],
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "canon", "requires"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^RULE-[A-Z0-9-]+$" },
+              "canon": { "type": "string", "pattern": "^core/" },
+              "requires": { "type": "array", "items": { "type": "string" } },
+              "optional": { "type": "boolean" },
+              "instance_key": { "type": "string" }
+            },
+            "allOf": [
+              {
+                "if": { "required": ["optional"], "properties": { "optional": { "const": true } } },
+                "then": { "required": ["instance_key"] }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

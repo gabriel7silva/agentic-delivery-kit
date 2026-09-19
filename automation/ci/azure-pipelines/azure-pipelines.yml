@@ -1,0 +1,75 @@
+# PACT gate for Azure Repos pull requests. Same three checks as the GitHub
+# workflows: origin traces, template integrity, and the PR validator.
+#
+# Copy to your repository root (or merge the stages into your pipeline) in a
+# repository that vendors the kit at .pact/ (see .pact/automation/ci/INSTALL.md).
+# Then add this pipeline as Build validation in the branch policy
+# (.pact/tracks/azure-devops/policies.md).
+#
+# Variables to set on the pipeline (Library → Variable group, or pipeline UI):
+#   PACT_DENYLIST   secret; comma-separated literal terms to forbid
+#
+# The PR description is read from the Azure DevOps API with the build's own
+# token (System.AccessToken) — allow it under Pipeline settings → "Allow scripts
+# to access the OAuth token".
+
+trigger: none
+pr:
+  branches:
+    include: ['*']
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  PYTHON_VERSION: '3.12'
+
+stages:
+  - stage: leaks
+    displayName: L0 · origin traces
+    jobs:
+      - job: leaks
+        steps:
+          - template: templates/setup.yml
+          - script: python .pact/automation/scripts/check_leaks.py docs templates README.md
+            displayName: Structural rules + denylist
+            env:
+              PACT_DENYLIST: $(PACT_DENYLIST)
+
+  - stage: guard
+    displayName: scope · claims · review · risk · evidence
+    dependsOn: leaks
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: guard
+        steps:
+          - template: templates/setup.yml
+
+          - script: |
+              git fetch origin $(System.PullRequest.TargetBranch) --depth=200
+              git diff --name-only "origin/$(System.PullRequest.TargetBranch)...HEAD" > changed-paths.txt
+              echo "changed paths:"; cat changed-paths.txt
+            displayName: Changed paths
+
+          - script: |
+              curl -sS -u ":$(System.AccessToken)" \
+                "$(System.CollectionUri)$(System.TeamProject)/_apis/git/repositories/$(Build.Repository.ID)/pullRequests/$(System.PullRequest.PullRequestId)?api-version=7.1" \
+                | python3 -c "import sys,json; print(json.load(sys.stdin).get('description',''))" > pr-body.md
+            displayName: PR description
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+          # Optional: a step here may write context.json from the linked work
+          # item (see .pact/automation/sync/connectors/azure_devops.py). When
+          # absent, the pact-context block in the PR description is used.
+
+          - script: |
+              if [ -f context.json ]; then
+                python .pact/automation/scripts/validate_pr.py --changed-paths changed-paths.txt --context context.json --pr-body pr-body.md
+              else
+                python .pact/automation/scripts/validate_pr.py --changed-paths changed-paths.txt --pr-body pr-body.md
+              fi
+            displayName: Validate
+
+          - script: python .pact/automation/scripts/check_canon.py
+            displayName: Fenced fragments and placeholders

@@ -1,0 +1,20 @@
+# Slack — what the tool can do. Schema: schemas/capabilities.schema.json
+version: 1
+track: slack
+
+capabilities:
+  sot_eligible: false          # by design and by contract
+  durable_history: false       # retention policies, silent edits, no attributable field history
+  custom_fields: true          # Slack Lists have typed fields
+  native_hierarchy: false
+  comments: true               # threads — dated and attributable, but see durable_history
+  attachments: true            # files in threads — subject to retention; copied to the SoT
+  code_review: false
+  ci: false
+  iteration_native: false
+  automation_hooks: true       # Workflow Builder, Events API, scheduled messages
+  queries: true                # List views with filters; limited
+
+notes:
+  sot_eligible: check_instance.py rejects an instance whose source_of_truth.track is slack. Pair it with a SoT-eligible track and list slack under mirrors.
+  comments: A thread is fine for a human gate conversation. The DECISION is copied to the SoT item; the thread is not the record.

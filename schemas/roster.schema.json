@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/roster.schema.json",
+  "title": "PACT agent roster",
+  "description": "agents/roster.yml — the neutral catalogue of agents. No runtime or vendor names.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "agents"],
+  "properties": {
+    "version": { "const": 1 },
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "purpose", "inputs", "outputs", "brief"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "kind": { "type": "string", "enum": ["orchestrator", "implementer", "reviewer", "advisor"] },
+          "purpose": { "type": "string", "minLength": 1 },
+          "inputs": { "type": "array", "items": { "type": "string" } },
+          "outputs": { "type": "array", "items": { "type": "string" } },
+          "brief": { "type": "string", "pattern": "^agents/briefs/[a-z0-9-]+\\.md$" },
+          "read_only": { "type": "boolean" },
+          "serves_gate": { "type": "string", "enum": ["VERIFICATION", "PEER_REVIEW", "HUMAN_REVIEW", "APPROVAL"] },
+          "verdict_shape": { "type": "string" },
+          "may_raise_risk": { "type": "boolean" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "kind": { "const": "reviewer" } } },
+            "then": { "required": ["read_only", "serves_gate"], "properties": { "read_only": { "const": true } } }
+          }
+        ]
+      }
+    }
+  }
+}

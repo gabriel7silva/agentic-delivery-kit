@@ -1,0 +1,43 @@
+# Risk floors by path. Schema: schemas/policies.schema.json (policy: risk-floors)
+# Canon: RULE-RISK
+#
+#   risk = MAX( highest reviewer verdict , floor of every touched path )
+#
+# The floor is the level a path can never go BELOW, whatever a reviewer says.
+# Keep the list narrow and honest: a floor on everything is a floor on nothing,
+# because every change then needs the same two human gates and people stop
+# reading them. These are defaults for a typical application; adapt the globs.
+#
+# Precedence: most specific matching glob wins. Anything unmatched is `medium`.
+
+version: 1
+policy: risk-floors
+
+floors:
+  - paths: ["docs/**", "*.md", "CHANGELOG.md"]
+    floor: low
+    why: Reversible by construction; a wrong document costs a re-read, not data
+
+  - paths: ["tests/**", "test/**", "**/*_test.*", "**/*.test.*"]
+    floor: low
+    why: A broken test fails loudly; a deleted test is caught by the correctness reviewer
+
+  - paths: ["src/**", "app/**", "lib/**"]
+    floor: medium
+    why: Behaviour changes that a user sees; reversible, but not free
+
+  - paths: ["src/storage/**", "src/net/**", "src/db/**", "migrations/**", "app/storage/**", "app/net/**"]
+    floor: high
+    why: Reads or writes user data across a trust boundary; a mistake is hard to reverse
+
+  - paths: ["config/permissions/**", "**/*.policy.*", ".github/workflows/**", "ci/**", "pipelines/**"]
+    floor: high
+    why: Decides what is allowed to run and with which rights
+
+  - paths: ["schemas/**", "**/*.schema.*", "api/**/*.yaml", "api/**/*.json"]
+    floor: high
+    why: A contract with something outside this change — persisted data or another party
+
+  - paths: ["agents/**", "instance.yml"]
+    floor: high
+    why: The method's own guardrails; an agent editing them to pass its own change is AP-FLOOR-EDIT

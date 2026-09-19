@@ -1,0 +1,20 @@
+# Notion — what the tool can do. Schema: schemas/capabilities.schema.json
+version: 1
+track: notion
+
+capabilities:
+  sot_eligible: true
+  durable_history: true        # page history and comments are attributable and kept; property changes appear in page history on paid plans
+  custom_fields: true          # properties of many types
+  native_hierarchy: true       # sub-items relation, once enabled
+  comments: true               # page comments, dated and attributable
+  attachments: true
+  code_review: false           # no change-request object
+  ci: false                    # no verification runner
+  iteration_native: false      # a relation to a second database; no dated sprint entity outside the Projects template
+  automation_hooks: true       # API, database automations, integration webhooks
+  queries: true                # filtered and sorted views; API filters
+
+notes:
+  code_review: The review gate is substituted — see substitutes.md. It is real but not enforced.
+  durable_history: Property-change history requires a plan that includes page history; verify on yours before declaring this track the source of truth.

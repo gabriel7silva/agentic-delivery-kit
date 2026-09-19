@@ -1,0 +1,49 @@
+# Sync configuration — copy to config.yml (git-ignored). No secrets here: tokens
+# come from the environment (SECURITY.md).
+
+version: 1
+
+# Exactly one. The connector for this track reads; nothing else writes to it.
+source_of_truth:
+  track: github-projects
+  github_projects:
+    owner: example-org            # organization or user login
+    project_number: 1
+    repository: example-org/delivery
+
+# Read-only projections of the source of truth.
+mirrors:
+  - track: notion
+    notion:
+      database_id: 00000000000000000000000000000000   # placeholder
+  - track: slack
+    slack:
+      list_id: F0000000000                             # placeholder
+      channels:
+        updates: delivery-updates
+        digest: delivery-digest
+        gates: delivery-gates
+        blockers: delivery-blockers
+
+# Alternative SoT blocks, for reference:
+#
+# source_of_truth:
+#   track: azure-devops
+#   azure_devops:
+#     organization: example-org
+#     project: Delivery
+#     query_id: 00000000-0000-0000-0000-000000000000   # a saved WIQL query
+#
+# source_of_truth:
+#   track: notion
+#   notion:
+#     database_id: 00000000000000000000000000000000
+
+# Field-name overrides if your tool names differ from the track's mapping.yml.
+overrides: {}
+
+# Digest: when and where.
+digest:
+  post_to: slack
+  at_local_time: "08:00"
+  timezone: UTC

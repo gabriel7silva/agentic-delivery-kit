@@ -1,0 +1,30 @@
+# Fixture — must be REJECTED: the default pattern uses {product} and organization.product is missing.
+version: 1
+language: en
+topology: agent-to-human
+organization: { name: Acme Corp, profile: internal }
+source_of_truth: { track: github-projects, board: Delivery }
+roles:
+  product_owner: { kind: human, title: Product Owner }
+  orchestrator: { kind: agent, title: Delivery Orchestrator }
+  implementer: { kind: agent, title: Implementer }
+  reviewers: { kind: agent, roster: agents/roster.yml }
+  approver: { kind: human, title: Product Owner }
+cadence:
+  timezone: UTC
+  iteration_length_days: 7
+  iteration_start_day: monday
+  sprint_close: friday
+  iteration_name_pattern: "Sprint {seq:02} {yy} Q{quarter} {product}"
+  sequence_resets: year
+  planning: start of iteration, on the start day
+  sync: daily
+  refinement: at sprint close
+  review: at sprint close
+  retrospective: at sprint close
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  verification_commands: [make test]
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+risk: { policy_file: agents/policies/risk-floors.yml, levels: [low, medium, high] }

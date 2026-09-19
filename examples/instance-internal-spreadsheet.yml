@@ -1,0 +1,54 @@
+# Example instance — a two-person team's first weeks: a hosted spreadsheet as source of truth,
+# no mirror, a six-state lifecycle, one agent doing the work and a person accepting.
+version: 1
+language: en
+topology: agent-to-human
+
+organization:
+  name: Acme Corp
+  product: Acme Portal
+  profile: internal
+
+source_of_truth:
+  track: spreadsheet
+  board: Delivery workbook (shared drive, version history on)
+
+roles:
+  product_owner: { kind: human, title: Product Owner }
+  orchestrator: { kind: human, title: Product Owner }   # the PO dispatches by hand with the prompt pack
+  implementer: { kind: agent, title: Implementer }
+  reviewers: { kind: agent, roster: agents/roster.yml }
+  approver: { kind: human, title: Product Owner }
+
+cadence:
+  timezone: UTC
+  iteration_length_days: 7
+  iteration_start_day: monday
+  sprint_close: friday
+  iteration_name_pattern: "Sprint {seq:02} {yy} Q{quarter} {product}"
+  sequence_resets: year
+  planning: start of iteration, on the start day
+  sync: daily
+  refinement: at sprint close
+  review: at sprint close
+  retrospective: at sprint close
+
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  verification_commands: [make test]
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+
+risk:
+  policy_file: agents/policies/risk-floors.yml
+  levels: [low, medium, high]
+
+optional_rules:
+  require_client_signoff: false
+  require_changelog_entry: true   # internal profile default; cannot be lowered
+  require_iteration_report: false
+  require_homologation_qa: false
+
+# Six of the twelve states: enough for a sheet, every category still present.
+lifecycle:
+  states: [NEW, AWAITING_DEVELOPMENT, IN_DEVELOPMENT, AWAITING_TEST, CLOSED, REMOVED]

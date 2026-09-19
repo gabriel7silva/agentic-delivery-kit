@@ -1,0 +1,34 @@
+name: docs-lint
+
+# Leak gate and template integrity for a repository that vendors the kit at
+# .pact/. Runs the kit's own checks against YOUR documents: no origin traces,
+# fenced template blocks still matching their fragments, placeholders that
+# resolve in your instance.yml.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r .pact/automation/requirements.txt
+
+      - name: Origin traces
+        env:
+          PACT_DENYLIST: ${{ secrets.PACT_DENYLIST }}
+        run: python .pact/automation/scripts/check_leaks.py docs templates README.md
+
+      - name: Fenced fragments and placeholders
+        run: python .pact/automation/scripts/check_canon.py

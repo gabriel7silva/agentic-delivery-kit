@@ -1,0 +1,14 @@
+# Internal profile — you build a product with internal stakeholders.
+version: 1
+profile: internal
+
+optional_rules:
+  require_client_signoff: false      # the approver is inside; a state change by them is enough
+  require_changelog_entry: true
+  require_iteration_report: false    # the stakeholder update covers it when wanted
+  require_homologation_qa: false     # turn on to require QA + key user before Closed
+
+defaults:
+  roles:
+    approver:
+      title: Product Owner           # usually the same person as the PO

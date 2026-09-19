@@ -1,0 +1,191 @@
+# Spreadsheet — neutral symbol → tool. Schema: schemas/mapping.schema.json
+#
+# One workbook, three sheets: "Work items" (one row per item), "Iterations", "Comments".
+# Every "custom" below is a column with data validation where the symbol is select-like.
+
+version: 1
+track: spreadsheet
+
+symbols:
+  # ── entities ──────────────────────────────────────────────────────────────
+  ITEM:
+    kind: custom
+    as: A row in the "Work items" sheet
+    how: One row per item; the ID column is the key. Never sort the sheet in place — use filter views
+  ITEM_PARENT:
+    kind: unsupported
+    substitute:
+      mechanism: A "Parent" column holding the parent's ID
+      evidence: The column, filterable
+      loses: Tree views and roll-ups; a filter on Parent is the nearest thing
+  ITERATION:
+    kind: unsupported
+    substitute:
+      mechanism: An "Iterations" sheet with Name, Start, End, Goal, Capacity; an "Iteration" column on Work items with data validation from that sheet
+      evidence: The two sheets
+      loses: Burndown and velocity; a COUNTIF per iteration gives the closed count
+  CLAIM:
+    kind: custom
+    as: Column "Claim" + a row comment
+    how: Paste the claim block into the cell; the release replaces it and is also posted as a row comment for history
+  REVIEW_GATE:
+    kind: unsupported
+    substitute:
+      mechanism: The pull request in the code host is the gate; one checkbox column "Reviewed · <reviewer>" per required reviewer mirrors the verdict; "Risk" is set to MAX(verdicts, floor)
+      evidence: The verdict comments on the pull request; the checkbox is a summary
+      loses: Enforcement in the sheet. The PR validator in the code host enforces; the "Unreviewed" filter view surfaces what people missed
+  CHANGE_REQUEST:
+    kind: unsupported
+    substitute:
+      mechanism: The pull request in the code host; its URL in the "Change" column
+      evidence: The pull request
+      loses: Nothing, if the code host has one. Everything, if it does not
+  EVIDENCE_LINK:
+    kind: custom
+    as: Column "Evidence" (URLs, one per criterion)
+    how: Links to runs, files, screenshots hosted elsewhere; the sheet holds no files
+  CONCLUSION_COMMENT:
+    kind: custom
+    as: A row in the "Comments" sheet (Item, Date, Role, Responsible, What was done, Link, Evidence, Next step) + a cell comment on the item pointing at it
+    how: One row per conclusion or evidence comment; the six fields are columns so they can be filtered
+  CEREMONY_MINUTES:
+    kind: custom
+    as: A "Minutes" column linking to the minutes document
+    how: Minutes are documents (templates/ceremonies/); the sheet keeps the link per iteration on the Iterations sheet
+  DIGEST:
+    kind: custom
+    as: Four filter views on "Work items", one per section of the daily digest
+    how: Active · Blockers · Needs human · Ready for review; a script may paste them into a channel
+
+  # ── item types → "Type" column ─────────────────────────────────────────────
+  EPIC:
+    kind: custom
+    as: Type = Epic
+    how: Data validation list on the "Type" column
+  FEATURE:
+    kind: custom
+    as: Type = Feature
+    how: Data validation list on the "Type" column
+  STORY:
+    kind: custom
+    as: Type = Story
+    how: Data validation list on the "Type" column
+  TASK:
+    kind: custom
+    as: Type = Task
+    how: Data validation list on the "Type" column
+  BUG:
+    kind: custom
+    as: Type = Bug
+    how: Data validation list on the "Type" column
+  ISSUE:
+    kind: custom
+    as: Type = Issue
+    how: Data validation list on the "Type" column
+
+  # ── WI-State → data-validated column ──────────────────────────────────────
+  WI_STATE:
+    kind: custom
+    as: Column "WI-State", data validation list
+    how: The twelve names below (or the instance's subset); conditional formatting per category helps the eye. Nothing stops a person choosing Closed — the rule is people-enforced here
+    values:
+      NEW: New
+      IN_ANALYSIS: In analysis
+      AWAITING_DEVELOPMENT: Awaiting development
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      CLOSED: Closed
+      REMOVED: Removed
+
+  # ── board columns → "Status" column ───────────────────────────────────────
+  STATUS:
+    kind: custom
+    as: Column "Status", data validation list
+    how: A spreadsheet has no board; a filter view per Status value is the column
+    values:
+      BACKLOG: Backlog
+      IN_ANALYSIS: In analysis
+      READY: Ready
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      DONE: Done
+
+  # ── fields ────────────────────────────────────────────────────────────────
+  ITEM_ID:
+    kind: custom
+    as: Column "ID"
+    how: Typed by hand, e.g. WI-42; unique; never reused
+  ITEM_TYPE:
+    kind: custom
+    as: Column "Type"
+    how: Data validation list — see the item types above
+  PARENT:
+    kind: custom
+    as: Column "Parent"
+    how: The parent's ID
+  PRIORITY:
+    kind: custom
+    as: Column "Priority"
+    how: Data validation list P1–P4
+  ROLE:
+    kind: custom
+    as: Column "Role"
+    how: Data validation list from the instance's role ids
+  RISK:
+    kind: custom
+    as: Column "Risk"
+    how: Data validation list low / medium / high
+  BRANCH:
+    kind: custom
+    as: Column "Branch"
+    how: The feature branch, typed the moment it exists; never the default branch
+  CHANGE_LINK:
+    kind: custom
+    as: Column "Change"
+    how: The pull request URL, the moment it exists
+  HOMOLOG_LINK:
+    kind: custom
+    as: Column "Homologation"
+    how: QA pastes the running environment URL for this item's branch; the key user tests that URL
+  START_DATE:
+    kind: custom
+    as: Column "Start"
+    how: Date; typed the day the item enters In development
+  TARGET_DATE:
+    kind: custom
+    as: Column "Target"
+    how: Date; typed in Planning, before Ready
+  TAGS:
+    kind: custom
+    as: Column "Tags"
+    how: Comma-separated; keep needs-human
+  RETRO:
+    kind: custom
+    as: Column "Retro"
+    how: Free text
+  EFFORT:
+    kind: custom
+    as: Column "Effort"
+    how: Number; SUM in the Iterations sheet when track_sprint_metrics is on
+  REMAINING_WORK:
+    kind: custom
+    as: Column "Remaining"
+    how: Number, on Task rows
+  BUSINESS_VALUE:
+    kind: custom
+    as: Column "Business value"
+    how: Number, on Epic and Feature rows
+  EXTERNAL_REF:
+    kind: custom
+    as: Column "External ref"
+    how: Text; the Title also starts with "[<ref>]" when require_external_ref is on

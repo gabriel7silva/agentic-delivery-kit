@@ -1,0 +1,26 @@
+# Local instance of the kit — never commit a filled-in instance
+instance.yml
+*.local.yml
+
+# Leak denylist is machine-local by design (see automation/scripts/check_leaks.py)
+.leakcheck-denylist
+
+# Optional render output
+.render-out/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sync: filled config and last-seen snapshots
+automation/sync/config.yml
+automation/sync/.state/
+
+# Adapters: the template generator must never leave output behind
+adapters/_template/out/

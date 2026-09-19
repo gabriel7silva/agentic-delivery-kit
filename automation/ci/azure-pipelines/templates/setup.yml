@@ -1,0 +1,14 @@
+# Reusable steps: checkout with submodules, Python, validator dependencies.
+steps:
+  - checkout: self
+    submodules: recursive
+    fetchDepth: 0
+    persistCredentials: true
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: $(PYTHON_VERSION)
+    displayName: Python $(PYTHON_VERSION)
+
+  - script: pip install -r .pact/automation/requirements.txt
+    displayName: Install validator dependencies

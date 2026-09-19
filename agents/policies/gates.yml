@@ -1,0 +1,36 @@
+# What each risk level demands. Schema: schemas/policies.schema.json (policy: gates)
+# Canon: RULE-RISK-GATES
+#
+# Defaults mirror core/model/review-gates.yml → risk_levels. An instance may make
+# a level STRICTER here; it may not make one looser than the model.
+
+version: 1
+policy: gates
+
+levels:
+  low:
+    to_resolved:
+      verification: true
+      reviewers: one                # any one reviewer from the scope's list
+      named_human: false
+    to_closed:
+      approver: true
+      in_writing: false             # a state change by the approver is enough
+
+  medium:
+    to_resolved:
+      verification: true
+      reviewers: all_scope_reviewers
+      named_human: false
+    to_closed:
+      approver: true
+      in_writing: false
+
+  high:
+    to_resolved:
+      verification: true
+      reviewers: all_scope_reviewers
+      named_human: true             # a person reviews BEFORE the agent may say it is done
+    to_closed:
+      approver: true
+      in_writing: true              # the acceptance is a written comment, not a click

@@ -1,0 +1,106 @@
+# Agent roster — neutral catalogue. Schema: schemas/roster.schema.json
+#
+# No runtime, no vendor, no model name. `brief` is the prose an adapter copies
+# verbatim. Reviewers are read-only by schema; they may raise risk, never lower it.
+
+version: 1
+
+agents:
+  - id: orchestrator
+    kind: orchestrator
+    purpose: Pull Ready items, issue handoffs, track claims and their expiry, build the daily digest, escalate human gates, arbitrate scope collisions. Never decides value; never writes code.
+    inputs:
+      - The board (source of truth) — items, states, claims
+      - instance.yml — cadence, roles
+      - agents/ownership.yml, agents/concurrency.yml
+    outputs:
+      - Handoffs (templates/flow/handoff.md) linked from items
+      - Claim release comments on expiry
+      - The daily digest (RULE-DAILY-DIGEST)
+      - Human-gate requests with the trigger named
+      - Issue items for tool failures and scope collisions
+    brief: agents/briefs/orchestrator.md
+
+  - id: implementer
+    kind: implementer
+    purpose: Execute one item inside one claimed scope, produce the change, the receipt and the conclusion comment, and stop at Resolved.
+    inputs:
+      - The handoff for the item
+      - AGENT-CONTEXT.md and CURRENT-FOCUS.md
+      - The scope's paths from agents/ownership.yml
+    outputs:
+      - A change on one branch, referencing the item
+      - templates/flow/receipt.md filled, including "Not verified / not claimed"
+      - The conclusion comment on the item
+      - A claim release
+    brief: agents/briefs/implementer.md
+
+  - id: reviewer-correctness
+    kind: reviewer
+    read_only: true
+    serves_gate: PEER_REVIEW
+    may_raise_risk: true
+    purpose: Does the change do what the acceptance criteria say, and nothing else? Logic, edge cases, tests that prove the criteria, behaviour outside the stated scope.
+    inputs:
+      - The diff
+      - The item's acceptance criteria
+      - The receipt's per-AC table
+    outputs:
+      - A verdict block (core/model/review-gates.yml → verdict_shape)
+    verdict_shape: core/model/review-gates.yml#verdict_shape
+    brief: agents/briefs/reviewer-correctness.md
+
+  - id: reviewer-security
+    kind: reviewer
+    read_only: true
+    serves_gate: PEER_REVIEW
+    may_raise_risk: true
+    purpose: Trust boundaries — user data on disk or over the network, credentials, permissions, injection, paths that escape their root, anything irreversible. Raises risk when a low-floor change turns out to touch one.
+    inputs:
+      - The diff
+      - agents/policies/risk-floors.yml
+    outputs:
+      - A verdict block
+    verdict_shape: core/model/review-gates.yml#verdict_shape
+    brief: agents/briefs/reviewer-security.md
+
+  - id: reviewer-docs
+    kind: reviewer
+    read_only: true
+    serves_gate: PEER_REVIEW
+    may_raise_risk: false
+    purpose: Is what a future reader needs written down next to the change — agent context updated, decision recorded, changelog line when the instance requires it, no stale document contradicted by the diff?
+    inputs:
+      - The diff
+      - AGENT-CONTEXT.md, CURRENT-FOCUS.md, the docs tree
+    outputs:
+      - A verdict block
+    verdict_shape: core/model/review-gates.yml#verdict_shape
+    brief: agents/briefs/reviewer-docs.md
+
+  - id: reviewer-delivery-compliance
+    kind: reviewer
+    read_only: true
+    serves_gate: PEER_REVIEW
+    may_raise_risk: true
+    purpose: Did the process happen? Claim inside the handoff's scopes, receipt complete with "Not verified / not claimed", conclusion comment with six fields, every AC evidenced or explicitly out of scope, no transition an agent may not make.
+    inputs:
+      - The item, its handoff, its receipt, its conclusion comment
+      - agents/ownership.yml, core/model/transitions.yml
+    outputs:
+      - A verdict block; blocking findings name the missing artifact
+    verdict_shape: core/model/review-gates.yml#verdict_shape
+    brief: agents/briefs/reviewer-delivery-compliance.md
+
+  - id: po-assistant
+    kind: advisor
+    purpose: Guide Product Owners and teams — people or agents — on ceremonies, the PO's role, work items and states, in the instance's language and tool; and turn a raw request into a refined specification (Feature, stories, scenarios, questions, registration tree). Never decides value; never sets a state; never writes code.
+    inputs:
+      - The person's question, or the raw request to refine (a report, an e-mail, notes, a thread)
+      - core/ (the method), instance.yml, AGENT-CONTEXT.md, CURRENT-FOCUS.md
+      - templates/flow/refined-spec.md, templates/work-items/user-story.md
+    outputs:
+      - An answer in the writing standard (core/16-writing-standard.md), citing rule ids
+      - A refined specification from templates/flow/refined-spec.md, posted on the item or handed to the PO
+      - Honest placeholders for every unknown, each addressed to a role
+    brief: agents/briefs/po-assistant.md

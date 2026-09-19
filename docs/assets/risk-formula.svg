@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" width="960" height="280" role="img" aria-label="risk equals the maximum of the reviewer verdict and the path floor. Two input bars change over time; the output bar always tracks the higher of the two; high risk turns on a human gate.">
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      animate, animateTransform, animateMotion { display: none; }
+    }
+  </style>
+  <defs>
+    <linearGradient id="gl" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#3fb950" stop-opacity=".55"/><stop offset="1" stop-color="#3fb950"/></linearGradient>
+    <linearGradient id="gm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8b949e" stop-opacity=".55"/><stop offset="1" stop-color="#8b949e"/></linearGradient>
+    <filter id="rg" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+    <text x="40" y="28" font-size="13" fill="#8b949e" letter-spacing="2" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">RISK COMES OUT OF THE REVIEW</text>
+    <text x="920" y="28" text-anchor="end" font-size="16" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">risk = MAX( verdict , floor )</text>
+
+    <g stroke="#6e7681" stroke-width="1" stroke-dasharray="3 5">
+      <line x1="60" y1="178" x2="780" y2="178"/>
+      <line x1="60" y1="138" x2="780" y2="138"/>
+      <line x1="60" y1="98" x2="780" y2="98"/>
+    </g>
+    <g font-size="11" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+      <text x="790" y="182">low</text>
+      <text x="790" y="142">medium</text>
+      <text x="790" y="102">high</text>
+    </g>
+    <line x1="60" y1="218" x2="780" y2="218" stroke="#8b949e" stroke-width="2"/>
+
+    <!-- verdict -->
+    <rect x="120" width="120" rx="6" fill="url(#gm)">
+      <animate attributeName="height" values="40;120;40;80;40" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="178;98;178;138;178" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/>
+    </rect>
+    <text x="180" y="244" text-anchor="middle" font-size="14" fill="#8b949e">reviewer verdict</text>
+    <text x="180" y="262" text-anchor="middle" font-size="11" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">may raise, never lower</text>
+
+    <!-- MAX chip -->
+    <g transform="translate(310,148)">
+      <rect x="-36" y="-18" width="72" height="36" rx="8" fill="none" stroke="#f0883e" stroke-width="2">
+        <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <text y="6" text-anchor="middle" font-size="16" font-weight="700" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">MAX</text>
+    </g>
+
+    <!-- floor -->
+    <rect x="390" width="120" rx="6" fill="url(#gm)">
+      <animate attributeName="height" values="80;40;120;80;80" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="138;178;98;138;138" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/>
+    </rect>
+    <text x="450" y="244" text-anchor="middle" font-size="14" fill="#8b949e">path floor</text>
+    <text x="450" y="262" text-anchor="middle" font-size="11" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">non-negotiable per path</text>
+
+    <text x="560" y="158" text-anchor="middle" font-size="28" fill="#8b949e">→</text>
+
+    <!-- result -->
+    <rect x="610" width="120" rx="6" filter="url(#rg)">
+      <animate attributeName="height" values="80;120;120;80;80" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="138;98;98;138;138" keyTimes="0;0.25;0.5;0.75;1" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="fill" values="#d29922;#f85149;#f85149;#d29922;#d29922" keyTimes="0;0.25;0.5;0.75;1" calcMode="discrete" dur="8s" repeatCount="indefinite"/>
+    </rect>
+    <text x="670" y="244" text-anchor="middle" font-size="14" font-weight="700" fill="#f0883e">risk</text>
+    <text x="670" y="262" text-anchor="middle" font-size="11" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">high → a named human</text>
+
+    <!-- human gate -->
+    <g opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.25;0.5;0.75;1" calcMode="discrete" dur="8s" repeatCount="indefinite"/>
+      <circle cx="670" cy="72" r="6" fill="#f85149">
+        <animate attributeName="r" values="5;7;5" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M662,90 Q670,78 678,90" fill="none" stroke="#f85149" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="692" y="86" font-size="12" fill="#f85149" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">human gate</text>
+    </g>
+
+    <!-- beat captions -->
+    <g font-size="10" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+      <text x="40" y="56">the floor protects you from an optimistic reviewer · the verdict protects you from a blind rule</text>
+    </g>
+  </g>
+</svg>

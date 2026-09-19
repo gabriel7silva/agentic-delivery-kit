@@ -1,0 +1,20 @@
+# Azure DevOps — what the tool can do. Schema: schemas/capabilities.schema.json
+version: 1
+track: azure-devops
+
+capabilities:
+  sot_eligible: true
+  durable_history: true        # every field change is in the item's History tab, attributable, forever
+  custom_fields: true          # Process → Fields (inherited process); XML process for on-prem
+  native_hierarchy: true       # Parent/Child links, N levels
+  comments: true               # Discussion
+  attachments: true
+  code_review: true            # Azure Repos PRs with required reviewers and branch policies
+  ci: true                     # Azure Pipelines
+  iteration_native: true       # Iteration Path with dates
+  automation_hooks: true       # Service hooks, REST API, pipelines triggered by work-item events
+  queries: true                # WIQL, saved queries, dashboards
+
+notes:
+  custom_fields: Requires an inherited process; the default system processes are read-only. Create one from Agile and switch the project to it.
+  code_review: Branch policies can require a minimum reviewer count, specific reviewers per path, and a linked work item — enough to implement the review gate without any script.

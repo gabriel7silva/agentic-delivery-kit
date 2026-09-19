@@ -1,0 +1,25 @@
+-- Gate queue: everything waiting on a human.
+-- Resolved-category items (the human queue) plus anything tagged needs-human that is not Closed.
+-- Save as a shared query "PACT / Gate queue" and pin it to the PO dashboard.
+
+SELECT
+    [System.Id],
+    [System.WorkItemType],
+    [System.Title],
+    [System.State],
+    [Custom.PACTRisk],
+    [System.Tags],
+    [System.ChangedDate]
+FROM WorkItems
+WHERE
+    [System.TeamProject] = @project
+    AND [System.WorkItemType] IN ('User Story', 'Task', 'Bug')
+    AND (
+        [System.State] IN ('Awaiting test', 'Prepare homologation', 'Key-user homologation', 'Prepare release', 'Integration test')
+        OR (
+            [System.Tags] CONTAINS 'needs-human'
+            AND [System.State] <> 'Closed'
+            AND [System.State] <> 'Removed'
+        )
+    )
+ORDER BY [System.ChangedDate] ASC

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/policies.schema.json",
+  "title": "PACT policies",
+  "description": "One schema, three files under agents/policies/ selected by `policy`: risk-floors, gates, escalation. Plus agents/concurrency.yml.",
+  "type": "object",
+  "required": ["version", "policy"],
+  "properties": {
+    "version": { "const": 1 },
+    "policy": { "type": "string", "enum": ["risk-floors", "gates", "escalation", "concurrency"] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "policy": { "const": "risk-floors" } } },
+      "then": {
+        "required": ["floors"],
+        "properties": {
+          "floors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["paths", "floor"],
+              "properties": {
+                "paths": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+                "floor": { "type": "string", "enum": ["low", "medium", "high"] },
+                "why": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "policy": { "const": "gates" } } },
+      "then": {
+        "required": ["levels"],
+        "properties": {
+          "levels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["to_resolved", "to_closed"],
+              "properties": {
+                "to_resolved": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "verification": { "type": "boolean" },
+                    "reviewers": { "type": "string", "enum": ["one", "all_scope_reviewers"] },
+                    "named_human": { "type": "boolean" }
+                  }
+                },
+                "to_closed": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "approver": { "type": "boolean" },
+                    "in_writing": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "policy": { "const": "escalation" } } },
+      "then": {
+        "required": ["triggers"],
+        "properties": {
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "canon", "decides", "conditions"],
+              "properties": {
+                "id": { "type": "string" },
+                "canon": { "type": "string" },
+                "decides": { "type": "string", "enum": ["product_owner", "approver"] },
+                "conditions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+                "examples": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "policy": { "const": "concurrency" } } },
+      "then": {
+        "required": ["claim"],
+        "properties": {
+          "claim": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ttl_hours", "max_open_per_scope", "lives_in"],
+            "properties": {
+              "ttl_hours": { "type": "number", "exclusiveMinimum": 0 },
+              "max_open_per_scope": { "const": 1 },
+              "lives_in": { "const": "source_of_truth" },
+              "released_on": { "type": "array", "items": { "type": "string" } },
+              "expired_by": { "type": "string" }
+            }
+          },
+          "arbitration": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "precedence": { "type": "string" },
+              "on_conflict": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

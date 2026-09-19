@@ -1,0 +1,158 @@
+# WI-States and their categories. Canon: RULE-STATES · RULE-STATE-CATEGORIES (core/05-states.md)
+#
+# Two levels, on purpose:
+#   categories — the five lifecycle categories every rule, gate and track speaks in
+#                (NEW · ACTIVE · RESOLVED · CLOSED · REMOVED). They never change.
+#   states     — the twelve default WI-States, each carrying its category. An instance
+#                may rename or drop states (instance.yml → lifecycle); it may never
+#                drop a category, nor take CLOSED or REMOVED out of human hands.
+#
+# `set_by` lists the roles allowed to move an item INTO this state. CLOSED and
+# REMOVED list only human roles — that is RULE-STATE-RESOLVED-NOT-CLOSED as data.
+# `qa` and `key_user` are instance hats (core/14-homologation.md), not method roles.
+
+version: 1
+
+categories:
+  - id: NEW
+    name: New
+    pact_phase: PLAN
+    meaning: Registered; no agent has started on it
+  - id: ACTIVE
+    name: Active
+    pact_phase: ACT
+    meaning: Pulled; an agent (or a chain) is executing and evidence accrues on the item
+  - id: RESOLVED
+    name: Resolved
+    pact_phase: CHECK
+    meaning: The agent's part is done and evidenced; people are validating it
+  - id: CLOSED
+    name: Closed
+    pact_phase: TRANSFER
+    meaning: Accepted by a human; counts as delivered
+    human_only: true
+  - id: REMOVED
+    name: Removed
+    pact_phase: null
+    meaning: Discarded; never counts as delivered
+    human_only: true
+
+states:
+  # ── NEW ──────────────────────────────────────────────────────────────────────
+  - id: NEW
+    name: New
+    category: NEW
+    meaning: In the backlog; nobody has looked at it yet
+    set_by: [product_owner, orchestrator]
+    counts_as_delivered: false
+
+  - id: IN_ANALYSIS
+    name: In analysis
+    category: NEW
+    meaning: Being refined — value, criteria and limits are being written; the Definition of Ready is not met yet
+    set_by: [product_owner, orchestrator]
+    counts_as_delivered: false
+
+  - id: AWAITING_DEVELOPMENT
+    name: Awaiting development
+    category: NEW
+    meaning: Definition of Ready met; may be pulled. The Ready column
+    set_by: [product_owner, orchestrator]
+    counts_as_delivered: false
+
+  # ── ACTIVE ───────────────────────────────────────────────────────────────────
+  - id: IN_DEVELOPMENT
+    name: In development
+    category: ACTIVE
+    meaning: Pulled; an implementer holds the claim and works inside it. Verification and reviewers run before it leaves
+    set_by: [orchestrator, implementer, approver, product_owner]   # approver / PO on rejection
+    counts_as_delivered: false
+
+  - id: BLOCKED
+    name: Blocked
+    category: ACTIVE
+    meaning: Pulled, but cannot proceed — an Issue names the impediment; the claim stays until it expires or is released
+    set_by: [orchestrator, implementer]
+    counts_as_delivered: false
+
+  # ── RESOLVED ─────────────────────────────────────────────────────────────────
+  - id: AWAITING_TEST
+    name: Awaiting test
+    category: RESOLVED
+    meaning: Verification and reviewers passed; the change is done and evidenced; waiting for a person to test it
+    set_by: [implementer, orchestrator]
+    counts_as_delivered: false
+
+  - id: PREPARE_HOMOLOGATION
+    name: Prepare homologation
+    category: RESOLVED
+    meaning: QA is starting the homologation environment for this item's branch and linking it on the item
+    set_by: [qa, orchestrator]
+    counts_as_delivered: false
+
+  - id: KEY_USER_HOMOLOGATION
+    name: Key-user homologation
+    category: RESOLVED
+    meaning: The key user tests on the linked environment and writes the result on the item for Transfer review
+    set_by: [qa, key_user]
+    counts_as_delivered: false
+
+  - id: PREPARE_RELEASE
+    name: Prepare release
+    category: RESOLVED
+    meaning: Transfer review accepted the evidence; the release is being prepared. External publication is a human gate
+    set_by: [approver, product_owner, orchestrator]
+    counts_as_delivered: false
+
+  - id: INTEGRATION_TEST
+    name: Integration test
+    category: RESOLVED
+    meaning: Released to the integration environment; the last check before a human accepts the value
+    set_by: [qa, orchestrator]
+    counts_as_delivered: false
+
+  # ── CLOSED · REMOVED — human only ────────────────────────────────────────────
+  - id: CLOSED
+    name: Closed
+    category: CLOSED
+    meaning: Accepted by a human; counts as delivered
+    set_by: [approver, product_owner]
+    human_only: true
+    counts_as_delivered: true
+
+  - id: REMOVED
+    name: Removed
+    category: REMOVED
+    meaning: Discarded — cancelled, duplicate, invalid; never counts as delivered
+    set_by: [product_owner]
+    human_only: true
+    counts_as_delivered: false
+
+default_path:
+  # The order an item normally travels. A move inside one category needs no gate;
+  # crossing a category boundary goes through transitions.yml. Rejection returns the
+  # item from any RESOLVED state to IN_DEVELOPMENT; BLOCKED sits beside IN_DEVELOPMENT.
+  - NEW
+  - IN_ANALYSIS
+  - AWAITING_DEVELOPMENT
+  - IN_DEVELOPMENT
+  - AWAITING_TEST
+  - PREPARE_HOMOLOGATION
+  - KEY_USER_HOMOLOGATION
+  - PREPARE_RELEASE
+  - INTEGRATION_TEST
+  - CLOSED
+
+pact_phases:
+  - id: PLAN
+    name: Plan
+    produces: A card that passes the Definition of Ready; a handoff
+  - id: ACT
+    name: Act
+    produces: A claim on a scope; the change itself
+  - id: CHECK
+    name: Check
+    produces: Passing verification; reviewer findings and a risk verdict; a receipt; the human tests that follow
+  - id: TRANSFER
+    name: Transfer
+    produces: A human's acceptance recorded on the item

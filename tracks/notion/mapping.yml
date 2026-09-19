@@ -1,0 +1,182 @@
+# Notion — neutral symbol → tool. Schema: schemas/mapping.schema.json
+
+version: 1
+track: notion
+
+symbols:
+  # ── entities ──────────────────────────────────────────────────────────────
+  ITEM:
+    kind: native
+    as: Page in the "Work items" database
+  ITEM_PARENT:
+    kind: custom
+    as: Sub-items relation (Parent item / Sub-items)
+    how: Database → ⋯ → Sub-items → enable; Notion creates the paired relation
+  ITERATION:
+    kind: custom
+    as: Relation to an "Iterations" database
+    how: Second database with Name, Start, End, Goal; relation property "Iteration" on Work items
+  CLAIM:
+    kind: custom
+    as: Text property "Claim" + page comment
+    how: Paste the claim block into the property; the release block replaces it and is also posted as a comment for history
+  REVIEW_GATE:
+    kind: unsupported
+    substitute:
+      mechanism: One checkbox property per required reviewer ("Reviewed · correctness", "Reviewed · security", …) plus the reviewer's verdict block posted as a page comment with a link to the diff in the code host
+      evidence: The comment carrying the verdict block; the checkbox is only a summary of it
+      loses: Enforcement. Nothing stops a page moving to Resolved with an unticked box; the daily digest reports it, a person acts on it
+  CHANGE_REQUEST:
+    kind: unsupported
+    substitute:
+      mechanism: URL property "Change link" pointing at the pull request in the code host
+      evidence: The URL, plus the merge reference pasted into the receipt
+      loses: Reviewer verdicts do not live on the change; they live on the page (see REVIEW_GATE)
+  EVIDENCE_LINK:
+    kind: native
+    as: Files & media property, or a link in the page body
+  CONCLUSION_COMMENT:
+    kind: native
+    as: Page comment
+    note: A comment, not a block in the page body — comments are dated and attributable, body edits are not
+  CEREMONY_MINUTES:
+    kind: native
+    as: Page in a "Minutes" database
+  DIGEST:
+    kind: custom
+    as: Linked database views on a "Daily digest" page, or an API script
+    how: Four linked views (Active / Blockers / Needs human / Ready for review) on one page; or automation/sync posts a summary comment
+
+  # ── item types → Select ───────────────────────────────────────────────────
+  EPIC:
+    kind: custom
+    as: Select "Type" = Epic
+    how: Select property "Type"
+  FEATURE:
+    kind: custom
+    as: Select "Type" = Feature
+    how: Same
+  STORY:
+    kind: custom
+    as: Select "Type" = Story
+    how: Same
+  TASK:
+    kind: custom
+    as: Select "Type" = Task
+    how: Same
+  BUG:
+    kind: custom
+    as: Select "Type" = Bug
+    how: Same
+  ISSUE:
+    kind: custom
+    as: Select "Type" = Issue
+    how: Same
+
+  # ── WI-State → Select (NOT the Status property) ──────────────────────────
+  WI_STATE:
+    kind: custom
+    as: Select "WI-State"
+    how: Plain Select. Do not use the Status property type for this — its To-do / In progress / Complete groups would conflate Resolved with Closed
+    values:
+      NEW: New
+      IN_ANALYSIS: In analysis
+      AWAITING_DEVELOPMENT: Awaiting development
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      CLOSED: Closed
+      REMOVED: Removed
+
+  # ── board columns → Status property ──────────────────────────────────────
+  STATUS:
+    kind: native
+    as: Status property "Status"
+    values:
+      BACKLOG: Backlog
+      IN_ANALYSIS: In analysis
+      READY: Ready
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      DONE: Done
+    note: Put Backlog, In analysis and Ready in the To-do group; Blocked through Integration test in the In progress group; Done alone in the Complete group
+
+  # ── fields ────────────────────────────────────────────────────────────────
+  ITEM_ID:
+    kind: native
+    as: ID property (auto-increment with prefix)
+  ITEM_TYPE:
+    kind: custom
+    as: Select "Type"
+    how: See item types
+  PARENT:
+    kind: custom
+    as: Parent item (relation)
+    how: Created by enabling Sub-items
+  PRIORITY:
+    kind: custom
+    as: Select "Priority"
+    how: Options P1–P4
+  ROLE:
+    kind: custom
+    as: Select "Role"
+    how: Options from instance.yml roles
+  RISK:
+    kind: custom
+    as: Select "Risk"
+    how: Options low / medium / high
+  BRANCH:
+    kind: custom
+    as: Text "Branch"
+    how: Feature branch of this item, never the default branch. Write the property, not only the page body.
+  CHANGE_LINK:
+    kind: custom
+    as: URL "Change link"
+    how: Pull-request URL the moment it exists
+  START_DATE:
+    kind: custom
+    as: Date "Start"
+    how: Type it the day WI-State becomes Active. Nothing fills it for you.
+  TARGET_DATE:
+    kind: custom
+    as: Date "Target"
+    how: Type it in Planning, before Ready. Nothing fills it for you.
+  HOMOLOG_LINK:
+    kind: custom
+    as: URL "Homologation"
+    how: QA pastes the running environment URL after starting it for this item's feature branch. The key user tests that URL.
+  TAGS:
+    kind: custom
+    as: Multi-select "Tags"
+    how: Multi-select; pre-create needs-human
+  RETRO:
+    kind: custom
+    as: Text "Retro"
+    how: Text property, optional
+
+  # ── optional fields: sprint metrics and external reference ────────────────
+  EFFORT:
+    kind: custom
+    as: Number "Effort"
+    how: Number property
+  REMAINING_WORK:
+    kind: custom
+    as: Number "Remaining"
+    how: Number property, on Task pages
+  BUSINESS_VALUE:
+    kind: custom
+    as: Number "Business value"
+    how: Number property
+  EXTERNAL_REF:
+    kind: custom
+    as: Text "External ref"
+    how: Text property; the page title also starts with "[<ref>]"

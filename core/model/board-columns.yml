@@ -1,0 +1,73 @@
+# Board columns — the SECOND axis. Canon: RULE-TWO-AXES (core/04-work-item-model.md)
+#
+# A column is a view of a WI-State, never a replacement for it. The default is one
+# column per visible state, so the board reads like the lifecycle. A track may
+# rename columns in its mapping.yml; an instance that runs fewer states
+# (instance.yml → lifecycle) simply has fewer columns. Nothing may change which
+# WI-State reaches DONE.
+
+version: 1
+
+columns:
+  - id: BACKLOG
+    name: Backlog
+    from_state: NEW
+    condition: Registered; not yet analysed
+  - id: IN_ANALYSIS
+    name: In analysis
+    from_state: IN_ANALYSIS
+  - id: READY
+    name: Ready
+    from_state: AWAITING_DEVELOPMENT
+    condition: DoR satisfied — may be pulled
+  - id: BLOCKED
+    name: Blocked
+    from_state: BLOCKED
+  - id: IN_DEVELOPMENT
+    name: In development
+    from_state: IN_DEVELOPMENT
+  - id: AWAITING_TEST
+    name: Awaiting test
+    from_state: AWAITING_TEST
+    note: First column of the Resolved category — an agent finished and a person has not tested yet
+  - id: PREPARE_HOMOLOGATION
+    name: Prepare homologation
+    from_state: PREPARE_HOMOLOGATION
+  - id: KEY_USER_HOMOLOGATION
+    name: Key-user homologation
+    from_state: KEY_USER_HOMOLOGATION
+  - id: PREPARE_RELEASE
+    name: Prepare release
+    from_state: PREPARE_RELEASE
+  - id: INTEGRATION_TEST
+    name: Integration test
+    from_state: INTEGRATION_TEST
+  - id: DONE
+    name: Done
+    from_state: CLOSED
+    reached_only_by: CLOSED       # RULE-STATE-RESOLVED-NOT-CLOSED, on the board
+
+# REMOVED items are hidden from the default board view; they are not a column.
+hidden_states: [REMOVED]
+
+translation:
+  # WI-State → column, one to one.
+  NEW: BACKLOG
+  IN_ANALYSIS: IN_ANALYSIS
+  AWAITING_DEVELOPMENT: READY
+  BLOCKED: BLOCKED
+  IN_DEVELOPMENT: IN_DEVELOPMENT
+  AWAITING_TEST: AWAITING_TEST
+  PREPARE_HOMOLOGATION: PREPARE_HOMOLOGATION
+  KEY_USER_HOMOLOGATION: KEY_USER_HOMOLOGATION
+  PREPARE_RELEASE: PREPARE_RELEASE
+  INTEGRATION_TEST: INTEGRATION_TEST
+  CLOSED: DONE
+  REMOVED: null
+
+category_bands:
+  # For a board with room for five columns only: collapse to the categories.
+  NEW: [BACKLOG, IN_ANALYSIS, READY]
+  ACTIVE: [BLOCKED, IN_DEVELOPMENT]
+  RESOLVED: [AWAITING_TEST, PREPARE_HOMOLOGATION, KEY_USER_HOMOLOGATION, PREPARE_RELEASE, INTEGRATION_TEST]
+  CLOSED: [DONE]

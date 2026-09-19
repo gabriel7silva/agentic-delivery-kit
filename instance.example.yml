@@ -1,0 +1,124 @@
+# PACT instance — copy to instance.yml and fill in.
+#
+# This is the ONLY file that knows anything about *your* setup. Everything else in
+# the kit is written against placeholders like {{SOURCE_OF_TRUTH}} and stays
+# reusable. If you find yourself pasting a team name into core/, templates/ or
+# tracks/, it belongs here instead.
+#
+# Nothing in this file is secret: tokens live in environment variables only
+# (see automation/sync/SECURITY.md).
+
+version: 1
+language: en   # BCP 47. Agents answer and write artifacts in this language; the kit stays in English
+
+# Who fills the roles and who hands work to whom — core/15-topologies.md.
+#   agent-to-human      a person plans and accepts; agents execute and review (default)
+#   agent-to-agent      an orchestrator-agent feeds agents; the PO may be an agent under a sponsor
+#   independent-agents  no orchestrator; a person dispatches each item to one agent
+#   bot-team            an existing system of bots wears the hats; PACT wraps it
+topology: agent-to-human
+
+# ── Who is running this ──────────────────────────────────────────────────────
+organization:
+  name: Acme Corp
+  product: Acme Portal           # what this instance delivers; {product} in the iteration name
+  # agency  → you deliver for an external client (adds client sign-off gates)
+  # internal→ you build a product with internal stakeholders
+  profile: internal
+
+# ── Where work items live ────────────────────────────────────────────────────
+# Exactly ONE track is the source of truth. Others may mirror it, never write to it.
+# A track whose capabilities say sot_eligible: false is rejected here.
+source_of_truth:
+  track: github-projects        # azure-devops | github-projects | notion
+  board: Delivery                # human name of the board/project, not a URL
+
+# Optional read-only mirrors and notification surfaces.
+mirrors:
+  - track: slack
+    purpose: notifications       # slack can never be the source of truth
+    channel: delivery-updates
+
+# ── Roles ────────────────────────────────────────────────────────────────────
+# Roles are named by FUNCTION, never by person or vendor. Who or what fills each
+# one is your business; the method only cares that the role exists.
+roles:
+  product_owner:
+    kind: human
+    title: Product Owner
+  orchestrator:
+    kind: agent
+    title: Delivery Orchestrator
+  implementer:
+    kind: agent
+    title: Implementer           # the single writer — see core/09-concurrency.md
+  reviewers:
+    kind: agent
+    roster: agents/roster.yml    # which reviewers run, and for which gates
+  approver:
+    kind: human                  # the role that may move an item to Closed (RULE-ROLES)
+    title: Accountable Approver   # for agency profiles, usually the client
+  qa:
+    kind: human                  # starts the homologation env and links branch + URL
+    title: QA
+  key_user:
+    kind: human                  # tests on that env and writes the update for the PO
+    title: Key user
+
+# ── Cadence ──────────────────────────────────────────────────────────────────
+# Ceremonies are events with minutes. An agent attends by writing on the ceremony
+# item, never by being in a room — core/ceremonies/README.md.
+cadence:
+  timezone: UTC
+  iteration_length_days: 7       # one week, the kit's default; 5 to 30 accepted
+  iteration_start_day: monday    # planning day, first day of the iteration
+  sprint_close: friday           # review → retrospective → refinement, one session, last working day
+  iteration_name_pattern: "Sprint {seq:02} {yy} Q{quarter} {product}"   # Sprint 01 26 Q1 Acme Portal
+  sequence_resets: year          # year | quarter | never — automation/scripts/iteration_name.py prints the name
+  planning: start of iteration, on the start day
+  sync: daily                    # a digest, not a standup — see core/ceremonies/daily.md
+  refinement: at sprint close
+  review: at sprint close
+  retrospective: at sprint close
+
+# ── Delivery conventions ─────────────────────────────────────────────────────
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  # Commands a contributor can run locally; the same ones the CI gate runs.
+  verification_commands:
+    - make lint
+    - make test
+  # Where the agent's always-read context lives (see core/11-docs-in-the-code.md).
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+  # Display name of the running environment QA starts for the feature branch.
+  # The key user tests there. How it is started is your runbook, not the kit.
+  homologation_environment: HMS
+  # Tag families and the values each allows (core/04-work-item-model.md → Tags). Keep
+  # needs-human: it is how a human gate shows on a board with no other way to show it.
+  # Values here are examples; empty lists are fine until you have yours.
+  tags:
+    process: [needs-human, spike, gap, improvement, tooling, doc, qa, ceremony]
+    category: [improvement, legal-requirement, duplicate]
+    module: []
+    project: []
+    year: []
+
+# ── Risk ─────────────────────────────────────────────────────────────────────
+# The floor is per-path and non-negotiable; reviewers may raise risk, never lower it.
+# risk = MAX(reviewer verdict, path floor) — see core/08-review-and-risk.md
+risk:
+  policy_file: agents/policies/risk-floors.yml
+  # Levels in ascending order. The last one always requires a human gate.
+  levels: [low, medium, high]
+
+# ── Optional rules ───────────────────────────────────────────────────────────
+# Rules marked `optional: true` in core/model/rules.yml can be toggled per instance.
+# A profile may flip these; it may never redefine a rule that is not optional.
+optional_rules:
+  require_client_signoff: false   # profiles/agency sets this to true
+  require_changelog_entry: true
+  require_iteration_report: false
+  require_homologation_qa: false  # set true to require QA + key-user before Closed
+  track_sprint_metrics: false     # effort, remaining work, business value and capacity on the board
+  require_external_ref: false     # items that answer an external request carry its id in a field and in the title

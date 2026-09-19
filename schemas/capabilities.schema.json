@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/capabilities.schema.json",
+  "title": "PACT track capabilities",
+  "description": "tracks/<name>/capabilities.yml — an honest declaration of what the tool can do, keyed by ids from core/model/capabilities.yml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "track", "capabilities"],
+  "properties": {
+    "version": { "const": 1 },
+    "track": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "capabilities": {
+      "type": "object",
+      "required": [
+        "sot_eligible", "durable_history", "custom_fields", "native_hierarchy",
+        "comments", "attachments", "code_review", "ci", "iteration_native",
+        "automation_hooks", "queries"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sot_eligible": { "type": "boolean" },
+        "durable_history": { "type": "boolean" },
+        "custom_fields": { "type": "boolean" },
+        "native_hierarchy": { "type": "boolean" },
+        "comments": { "type": "boolean" },
+        "attachments": { "type": "boolean" },
+        "code_review": { "type": "boolean" },
+        "ci": { "type": "boolean" },
+        "iteration_native": { "type": "boolean" },
+        "automation_hooks": { "type": "boolean" },
+        "queries": { "type": "boolean" }
+      }
+    },
+    "notes": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

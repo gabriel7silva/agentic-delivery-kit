@@ -1,0 +1,34 @@
+-- Daily digest source (RULE-DAILY-DIGEST). Four sections, one query each is clearer than one
+-- query with four ORs; this file holds them in order. Import each as its own shared query under
+-- "PACT / Digest".
+
+-- 1. Active items — progress against ACs comes from their latest Discussion comment.
+SELECT [System.Id], [System.Title], [Custom.PACTRole], [System.ChangedDate]
+FROM WorkItems
+WHERE [System.TeamProject] = @project
+  AND [System.State] IN ('In development', 'Blocked')          -- the ACTIVE category
+  AND [System.WorkItemType] IN ('User Story', 'Task', 'Bug')
+ORDER BY [System.ChangedDate] DESC
+
+-- 2. Blockers — open impediments and what they block.
+SELECT [System.Id], [System.Title], [System.CreatedDate]
+FROM WorkItems
+WHERE [System.TeamProject] = @project
+  AND [System.WorkItemType] = 'Issue'
+  AND [System.State] <> 'Closed'
+ORDER BY [System.CreatedDate] ASC
+
+-- 3. Decisions needed from a human.
+SELECT [System.Id], [System.Title], [System.State], [System.Tags]
+FROM WorkItems
+WHERE [System.TeamProject] = @project
+  AND [System.Tags] CONTAINS 'needs-human'
+  AND [System.State] NOT IN ('Closed', 'Removed')
+ORDER BY [System.ChangedDate] ASC
+
+-- 4. Ready for review — the Approver's queue, oldest first.
+SELECT [System.Id], [System.Title], [Custom.PACTRisk], [System.ChangedDate]
+FROM WorkItems
+WHERE [System.TeamProject] = @project
+  AND [System.State] IN ('Awaiting test', 'Prepare homologation', 'Key-user homologation', 'Prepare release', 'Integration test')   -- the RESOLVED category; trim to the states your instance runs
+ORDER BY [System.ChangedDate] ASC

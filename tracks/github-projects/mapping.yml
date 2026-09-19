@@ -1,0 +1,175 @@
+# GitHub Projects — neutral symbol → tool. Schema: schemas/mapping.schema.json
+
+version: 1
+track: github-projects
+
+symbols:
+  # ── entities ──────────────────────────────────────────────────────────────
+  ITEM:
+    kind: native
+    as: Issue
+  ITEM_PARENT:
+    kind: native
+    as: Sub-issue (parent/child)
+    note: Native hierarchy; the Project's tree view renders it
+  ITERATION:
+    kind: native
+    as: Project Iteration field
+    note: Has start date and duration; Milestones work too but lack a fixed length
+  CLAIM:
+    kind: custom
+    as: Label claim:<scope> + comment block
+    how: One label per scope named claim:<scope-id>; applying it is the claim, the claim block from templates/flow/scope-claim.md goes in a comment; removing the label releases it
+  REVIEW_GATE:
+    kind: native
+    as: Pull request review + CODEOWNERS + branch ruleset
+  CHANGE_REQUEST:
+    kind: native
+    as: Pull request
+  EVIDENCE_LINK:
+    kind: native
+    as: Issue attachment or link in a comment
+  CONCLUSION_COMMENT:
+    kind: native
+    as: Issue comment
+  CEREMONY_MINUTES:
+    kind: custom
+    as: docs/minutes/ in the repository, or a Discussion
+    how: A Markdown file per ceremony under docs/minutes/, linked from the iteration's tracking issue
+  DIGEST:
+    kind: custom
+    as: Scheduled Action that posts to a tracking issue
+    how: An Action on a cron reads the Project via GraphQL (queries/digest.graphql) and comments the four sections on a pinned "Daily digest" issue
+
+  # ── item types → issue type or label ──────────────────────────────────────
+  EPIC:
+    kind: custom
+    as: Issue type "Epic" (or label type:epic)
+    how: Organization issue types where available; otherwise the label
+  FEATURE:
+    kind: custom
+    as: Issue type "Feature" (or label type:feature)
+    how: Same
+  STORY:
+    kind: custom
+    as: Issue type "Story" (or label type:story)
+    how: Same
+  TASK:
+    kind: custom
+    as: Issue type "Task" (or label type:task)
+    how: Same
+  BUG:
+    kind: native
+    as: Issue type "Bug"
+    note: Bug is a default issue type; label type:bug where types are unavailable
+  ISSUE:
+    kind: custom
+    as: Label type:impediment
+    how: Label; it is outside the hierarchy so no sub-issue link
+
+  # ── WI-State → Project single-select field ────────────────────────────────
+  WI_STATE:
+    kind: custom
+    as: Project field "WI-State" (single select)
+    how: Project settings → new field, single select, options exactly as below
+    values:
+      NEW: New
+      IN_ANALYSIS: In analysis
+      AWAITING_DEVELOPMENT: Awaiting development
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      CLOSED: Closed
+      REMOVED: Removed
+
+  # ── board columns → Project Status field ──────────────────────────────────
+  STATUS:
+    kind: native
+    as: Project field "Status" (the built-in single select that drives the board)
+    values:
+      BACKLOG: Backlog
+      IN_ANALYSIS: In analysis
+      READY: Ready
+      BLOCKED: Blocked
+      IN_DEVELOPMENT: In development
+      AWAITING_TEST: Awaiting test
+      PREPARE_HOMOLOGATION: Prepare homologation
+      KEY_USER_HOMOLOGATION: Key-user homologation
+      PREPARE_RELEASE: Prepare release
+      INTEGRATION_TEST: Integration test
+      DONE: Done
+    note: Rename the default Todo / In Progress / Done options and add the rest, in the order of core/model/board-columns.yml; the board view groups by this field
+
+  # ── fields ────────────────────────────────────────────────────────────────
+  ITEM_ID:
+    kind: native
+    as: Issue number
+    note: Add a Project text field "WI-ID" for semantic ids if wanted
+  ITEM_TYPE:
+    kind: custom
+    as: Issue type, or Project single-select "Type"
+    how: See item types above
+  PARENT:
+    kind: native
+    as: Parent sub-issue link
+  PRIORITY:
+    kind: custom
+    as: Project single-select "Priority"
+    how: Options P1–P4
+  ROLE:
+    kind: custom
+    as: Project single-select "Role"
+    how: Options from instance.yml roles
+  RISK:
+    kind: custom
+    as: Project single-select "Risk"
+    how: Options low / medium / high; set by the review gate (the Action can set it via GraphQL)
+  BRANCH:
+    kind: native
+    as: Linked branch (Development section)
+    how: Create or link the branch from the issue (Development → Create a branch, or gh issue develop). A branch that only exists in the repo does not fill this.
+  CHANGE_LINK:
+    kind: native
+    as: Linked pull request (Development section)
+    how: Open the PR with Fixes #<n> / Closes #<n>, or Development → Link a pull request
+  START_DATE:
+    kind: custom
+    as: Project date field "Start date"
+    how: Type the date the day WI-State becomes Active. Nothing fills it for you.
+  TARGET_DATE:
+    kind: custom
+    as: Project date field "Target date"
+    how: Type it in Planning, before Ready. Nothing fills it for you.
+  HOMOLOG_LINK:
+    kind: custom
+    as: Project text field "Homologation"
+    how: QA pastes the running environment URL after starting it for this item's feature branch. The key user tests that URL.
+  TAGS:
+    kind: native
+    as: Labels
+  RETRO:
+    kind: custom
+    as: Project text field "Retro"
+    how: Text field, optional
+
+  # ── optional fields: sprint metrics and external reference ────────────────
+  EFFORT:
+    kind: custom
+    as: Project number field "Effort"
+    how: Number field; the roadmap and table views can sum it
+  REMAINING_WORK:
+    kind: custom
+    as: Project number field "Remaining work"
+    how: Number field on Task items
+  BUSINESS_VALUE:
+    kind: custom
+    as: Project number field "Business value"
+    how: Number field
+  EXTERNAL_REF:
+    kind: custom
+    as: Project text field "External ref"
+    how: Text field; the issue title also starts with "[<ref>]"

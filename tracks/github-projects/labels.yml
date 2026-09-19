@@ -1,0 +1,65 @@
+# Label taxonomy for the GitHub Projects track.
+# Apply with your label tool of choice; colours are suggestions.
+#
+# Labels carry what the Project cannot show on the issue itself: type (where
+# org issue types are unavailable), scope claims, and a visible risk mirror.
+
+version: 1
+
+labels:
+  # ── item type (only when organization issue types are not available)
+  - name: type:epic
+    color: "5319e7"
+    description: Epic — value initiative
+  - name: type:feature
+    color: "1d76db"
+    description: Feature — capability
+  - name: type:story
+    color: "0e8a16"
+    description: Story — need with acceptance criteria
+  - name: type:task
+    color: "c5def5"
+    description: Task — the unit an agent executes
+  - name: type:bug
+    color: "b60205"
+    description: Bug — proven defect
+  - name: type:impediment
+    color: "fbca04"
+    description: Issue — impediment (tool, auth, dependency, ambiguity)
+
+  # ── process tags (core/04-work-item-model.md)
+  - name: needs-human
+    color: "d93f0b"
+    description: A human decision or review is required before this moves
+  - name: spike
+    color: "bfd4f2"
+  - name: gap
+    color: "e99695"
+    description: Product gap — a Story, not a Bug
+  - name: improvement
+    color: "c2e0c6"
+  - name: tooling
+    color: "d4c5f9"
+  - name: doc
+    color: "f9d0c4"
+  - name: qa
+    color: "fef2c0"
+
+  # ── risk mirror (the Project field is authoritative; the label is for the eye)
+  - name: risk:low
+    color: "c2e0c6"
+  - name: risk:medium
+    color: "fbca04"
+  - name: risk:high
+    color: "b60205"
+    description: Named human review required before Resolved
+
+  # ── scope claims — ONE label per scope in agents/ownership.yml.
+  # Applying the label is the claim. Removing it is the release.
+  # Generate these from ownership.yml; two examples:
+  - name: claim:api
+    color: "0052cc"
+    description: Scope "api" is claimed — no other writer may touch its paths
+  - name: claim:docs
+    color: "0052cc"
+    description: Scope "docs" is claimed

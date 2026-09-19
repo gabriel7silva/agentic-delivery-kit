@@ -1,0 +1,27 @@
+# Roster concept → prompt-pack concept. See adapters/_contract/adapter-spec.md
+version: 1
+runtime: prompt-pack
+
+concepts:
+  agent:
+    as: One Markdown file pasted as the opening message of a conversation
+    enforcement: advises
+  read_only_reviewer:
+    as: Instruction in the prompt; the conversation has no write access anyway
+    enforcement: advises
+    stands_in: PR validator
+  parallel_review:
+    as: One conversation per reviewer, run at the same time
+    enforcement: advises
+  single_writer:
+    as: Instruction to claim before writing and stay inside the claim
+    enforcement: unsupported
+    stands_in: PR validator (RULE-SCOPE, RULE-CLAIM)
+  claim:
+    as: Instruction to record the claim block on the work item
+    enforcement: unsupported
+    stands_in: PR validator
+  human_gate:
+    as: Instruction to stop and post a gate request
+    enforcement: unsupported
+    stands_in: PR validator refuses Closed by a non-human role

@@ -1,0 +1,83 @@
+# The iteration entity, its cadence and its name. Canon: RULE-CEREMONIES · RULE-ITERATION-NAMING
+#
+# The method needs only three things from an iteration: that it has a start and
+# an end, that items can be assigned to it, and that Review and Retrospective
+# happen inside it. Everything else (sprint, cycle, milestone, wave) is naming —
+# and the name itself follows one pattern, so that people and agents read the
+# same thing on the board, in the minutes and in the digest.
+
+version: 1
+
+entity:
+  id: ITERATION
+  aliases: [Sprint, Cycle, Milestone, Wave]
+  fields:
+    - id: ITERATION_NAME
+      type: string
+      note: Rendered from naming.pattern (RULE-ITERATION-NAMING); automation/scripts/iteration_name.py prints it. The H1 of every minutes file
+    - id: ITERATION_START
+      type: date
+    - id: ITERATION_END
+      type: date
+    - id: ITERATION_GOAL
+      type: string
+      note: One sentence, set at Planning
+    - id: ITERATION_CAPACITY
+      type: number
+      note: Hours, points or agent runs available per role in this iteration — RULE-OPT-SPRINT-METRICS. The human bottleneck is planned first (core/ceremonies/planning.md)
+
+# How an iteration is named. The instance may override the pattern and the reset
+# under cadence:; the placeholders are fixed. A name is text — no tool, no weekday.
+naming:
+  pattern: "Sprint {seq:02} {yy} Q{quarter} {product}"    # Sprint 01 26 Q1 <product>
+  sequence_resets: year            # year | quarter | never — when {seq} goes back to 1
+  placeholders:
+    - id: seq
+      meaning: Sequence number since the last reset; "{seq:02}" zero-pads to two digits
+    - id: yy
+      meaning: Two-digit year of the start date
+    - id: yyyy
+      meaning: Four-digit year of the start date
+    - id: quarter
+      meaning: Quarter of the start date, 1 to 4
+    - id: half
+      meaning: Half of the year of the start date, 1 or 2
+    - id: product
+      meaning: organization.product from the instance — required when the pattern uses it
+    - id: start
+      meaning: Start date, ISO 8601
+    - id: end
+      meaning: End date, ISO 8601 — start plus length minus one
+
+cadence:
+  # Keys mirror instance.yml `cadence:`. Values here are constraints, not defaults.
+  iteration_length_days:
+    min: 5
+    max: 30
+    note: Longer than 30 days and the Review stops being a review. The shipped instances run seven
+  iteration_start_day:
+    required: false
+    note: A weekday — the planning day, first day of the iteration. The instance names it; the model names no day
+  planning:
+    required: true
+    when: first day of the iteration
+  sync:
+    required: true
+    form: digest                  # never a meeting — RULE-GOLDEN-EVENTS
+  refinement:
+    required: true
+    must_precede: planning
+    part_of: sprint_close
+  review:
+    required: true
+    min_per_iteration: 1
+    part_of: sprint_close
+  retrospective:
+    required: true
+    min_per_iteration: 1
+    part_of: sprint_close
+  sprint_close:
+    required: true
+    when: last working day of the iteration
+    order: [review, retrospective, refinement]   # one session, in this order — RULE-CEREMONY-SPRINT-CLOSE
+    note: The instance names the weekday under cadence.sprint_close; the model names none

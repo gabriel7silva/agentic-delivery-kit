@@ -1,0 +1,28 @@
+# Roster concept → <runtime> concept. See adapters/_contract/adapter-spec.md
+# Replace every <…>. `enforcement` is a promise about the RUNTIME — be exact.
+version: 1
+runtime: <runtime-name>
+
+concepts:
+  agent:
+    as: <what the runtime calls an agent definition — a file, a config entry>
+    enforcement: advises
+  read_only_reviewer:
+    as: <e.g. an agent whose tool set has no write tool>
+    enforcement: <enforces | advises | unsupported>
+    stands_in: PR validator
+  parallel_review:
+    as: <e.g. sub-agents launched together>
+    enforcement: <enforces | advises | unsupported>
+  single_writer:
+    as: <e.g. nothing — or a lock the runtime offers>
+    enforcement: <enforces | advises | unsupported>
+    stands_in: PR validator (RULE-SCOPE, RULE-CLAIM)
+  claim:
+    as: <how the agent is told to record the claim>
+    enforcement: <enforces | advises | unsupported>
+    stands_in: PR validator
+  human_gate:
+    as: <e.g. a permission prompt, or an instruction to stop>
+    enforcement: <enforces | advises | unsupported>
+    stands_in: PR validator refuses Closed by a non-human role

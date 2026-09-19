@@ -1,0 +1,46 @@
+name: kit-ci
+
+# CI for the kit itself. Level L0 (leaks) runs first and alone: if origin traces
+# are present, nothing else is worth reporting.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  leaks:
+    name: L0 · origin traces
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Structural rules + denylist
+        env:
+          # Literal terms to forbid live in a repository secret, never in a file.
+          PACT_DENYLIST: ${{ secrets.PACT_DENYLIST }}
+        run: python3 automation/scripts/check_leaks.py
+
+  verify:
+    name: L1–L6 · structure, data, behaviour, canon, adoption
+    needs: leaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r automation/requirements.txt
+      - run: make links
+      - run: make entry
+      - run: make schemas
+      - run: make mapping
+      - run: make test
+      - run: make canon
+      - run: make adapters
+      - run: make instance

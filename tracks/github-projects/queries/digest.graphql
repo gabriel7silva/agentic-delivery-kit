@@ -1,0 +1,73 @@
+# Daily digest source (RULE-DAILY-DIGEST) — GitHub GraphQL.
+# Fetch every item in the Project with the fields the digest needs, then split
+# into the four sections client-side (the Action in automation/ci does this).
+#
+# Variables: { "org": "<organization-login>", "number": <project-number> }
+# For a user-level project use `user(login:)` instead of `organization(login:)`.
+
+query PactDigest($org: String!, $number: Int!, $after: String) {
+  organization(login: $org) {
+    projectV2(number: $number) {
+      title
+      items(first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id
+          updatedAt
+          content {
+            ... on Issue {
+              number
+              title
+              url
+              state
+              labels(first: 20) { nodes { name } }
+              linkedBranches(first: 5) {
+                nodes { ref { name } }
+              }
+              comments(last: 1) {
+                nodes { body createdAt author { login } }
+              }
+            }
+          }
+          fieldValues(first: 30) {
+            nodes {
+              ... on ProjectV2ItemFieldSingleSelectValue {
+                name
+                field { ... on ProjectV2SingleSelectField { name } }
+              }
+              ... on ProjectV2ItemFieldTextValue {
+                text
+                field { ... on ProjectV2Field { name } }
+              }
+              ... on ProjectV2ItemFieldDateValue {
+                date
+                field { ... on ProjectV2Field { name } }
+              }
+              ... on ProjectV2ItemFieldNumberValue {
+                number
+                field { ... on ProjectV2Field { name } }
+              }
+              ... on ProjectV2ItemFieldIterationValue {
+                title
+                startDate
+                field { ... on ProjectV2IterationField { name } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# Section rules (applied to the result):
+# States are read by CATEGORY (core/model/item-states.yml), whatever subset the instance runs:
+#   ACTIVE   = In development, Blocked
+#   RESOLVED = Awaiting test, Prepare homologation, Key-user homologation, Prepare release, Integration test
+#   1. Active           WI-State in the ACTIVE category
+#   2. Blockers         label "type:impediment" AND state == OPEN
+#   3. Decisions        label "needs-human" AND WI-State not in ("Closed", "Removed")
+#   4. Ready for review WI-State in the RESOLVED category, sorted by updatedAt ascending
+# Defect report: state == CLOSED AND WI-State not in ("Closed", "Removed")
+# Untraced: WI-State in the ACTIVE or RESOLVED category AND (Start date empty OR Target date empty
+#           OR no linkedBranches on the issue)

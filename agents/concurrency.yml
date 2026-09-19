@@ -1,0 +1,24 @@
+# Concurrency policy — claims and arbitration. Schema: schemas/policies.schema.json (policy: concurrency)
+# Canon: RULE-CLAIM · RULE-ARBITRATION
+
+version: 1
+policy: concurrency
+
+claim:
+  ttl_hours: 4                      # longer than one focused session; shorter than "forgot about it"
+  max_open_per_scope: 1             # the whole point
+  lives_in: source_of_truth         # a field or label on the item — never a repository file (AP-CLAIM-IN-FILE)
+  released_on:
+    - resolved                      # ACTIVE → RESOLVED releases automatically
+    - rejected                      # RESOLVED → ACTIVE: the holder re-claims if it continues
+    - expired                       # TTL passed; the orchestrator posts the release
+    - released_by_holder
+  expired_by: orchestrator
+
+arbitration:
+  precedence: earlier claim wins
+  on_conflict:
+    - The later agent stops immediately; it holds nothing and releases nothing
+    - The later agent opens an Issue linking both items, kind scope-conflict
+    - The orchestrator decides — wait, or re-scope the later item; it never merges the two
+    - If both items genuinely need the same lines, refinement was wrong — back to the PO with split or defer

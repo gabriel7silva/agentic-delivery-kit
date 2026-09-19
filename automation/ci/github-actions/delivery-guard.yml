@@ -1,0 +1,59 @@
+name: delivery-guard
+
+# PACT gate for pull requests. Copy to .github/workflows/ in a repository that
+# vendors the kit at .pact/ (see .pact/automation/ci/INSTALL.md). Make it a
+# required status check.
+#
+# Inputs it derives itself: changed paths (git), PR body (event payload).
+# Inputs it needs from you: the pact-context block in the PR body, or a
+# context.json produced by an earlier step you write. A pass without that
+# step is a check of the author's declaration, not of the board.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    name: scope · claims · review · risk · evidence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validator dependencies
+        run: pip install -r .pact/automation/requirements.txt
+
+      - name: Changed paths
+        run: |
+          git diff --name-only "origin/${{ github.base_ref }}...HEAD" > changed-paths.txt
+          echo "::group::changed paths"; cat changed-paths.txt; echo "::endgroup::"
+
+      - name: PR body
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$PR_BODY" > pr-body.md
+
+      # Optional: a step you write may query the source of truth and write
+      # context.json. The sync connectors do not populate that file. When it
+      # does not exist, the pact-context block in the PR body is used.
+
+      - name: Validate
+        run: |
+          if [ -f context.json ]; then
+            python .pact/automation/scripts/validate_pr.py \
+              --changed-paths changed-paths.txt --context context.json --pr-body pr-body.md
+          else
+            python .pact/automation/scripts/validate_pr.py \
+              --changed-paths changed-paths.txt --pr-body pr-body.md
+          fi

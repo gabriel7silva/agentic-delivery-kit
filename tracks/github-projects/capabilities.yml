@@ -1,0 +1,20 @@
+# GitHub Projects — what the tool can do. Schema: schemas/capabilities.schema.json
+version: 1
+track: github-projects
+
+capabilities:
+  sot_eligible: true
+  durable_history: true        # issue timeline + Project field history, attributable
+  custom_fields: true          # Project fields: text, number, date, single select, iteration
+  native_hierarchy: true       # sub-issues
+  comments: true
+  attachments: true            # drag-and-drop into comments; durable URLs
+  code_review: true            # pull requests, CODEOWNERS, rulesets
+  ci: true                     # Actions
+  iteration_native: true       # Project Iteration field
+  automation_hooks: true       # webhooks, Actions on issue/project events, GraphQL API
+  queries: true                # Project views with filters; GraphQL for anything else
+
+notes:
+  custom_fields: Fields belong to the Project, not to the issue. One Project per instance, or the same issue carries two states.
+  native_hierarchy: Sub-issues nest several levels; the Project tree view shows Epic → Feature → Story → Task.

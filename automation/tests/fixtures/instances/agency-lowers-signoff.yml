@@ -1,0 +1,31 @@
+# Fixture — agency profile sets require_client_signoff true; instance lowers it.
+version: 1
+topology: agent-to-human
+organization: { name: Acme Corp, profile: agency }
+source_of_truth: { track: github-projects, board: Delivery }
+roles:
+  product_owner: { kind: human, title: Product Owner }
+  orchestrator: { kind: agent, title: Orchestrator }
+  implementer: { kind: agent, title: Implementer }
+  reviewers: { kind: agent, roster: agents/roster.yml }
+  approver: { kind: human, title: Approver }
+  qa: { kind: human, title: QA }
+  key_user: { kind: human, title: Key user }
+cadence:
+  timezone: UTC
+  iteration_length_days: 14
+  planning: start of iteration
+  sync: daily
+  refinement: weekly
+  review: end of iteration
+  retrospective: end of iteration
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  verification_commands: [make test]
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+  homologation_environment: HMS
+risk: { policy_file: agents/policies/risk-floors.yml, levels: [low, medium, high] }
+optional_rules:
+  require_client_signoff: false
+  require_homologation_qa: true

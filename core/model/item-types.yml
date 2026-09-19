@@ -1,0 +1,63 @@
+# Work-item types. Canon: RULE-ITEM-MODEL (core/04-work-item-model.md)
+#
+# `parent` lists the types an item of this type may have as parent. An empty
+# list means top-level. `agent_may_close` is false for every type an agent can
+# only bring to RESOLVED — see RULE-STATE-RESOLVED-NOT-CLOSED.
+
+version: 1
+
+types:
+  - id: EPIC
+    name: Epic
+    represents: A value initiative, months
+    parent: []
+    carried_by: product_owner
+    agent_may_close: false
+
+  - id: FEATURE
+    name: Feature
+    represents: A capability, a few iterations
+    parent: [EPIC]
+    carried_by: product_owner
+    agent_may_close: false
+
+  - id: STORY
+    name: Story
+    aliases: [PBI, User Story, Product Backlog Item]
+    represents: A need with acceptance criteria
+    parent: [FEATURE]
+    carried_by: implementer          # executes; the PO writes and accepts
+    agent_may_close: false
+    executable: true                 # may be the subject of a handoff
+
+  - id: TASK
+    name: Task
+    represents: An objective technical step — the unit an agent executes
+    parent: [STORY]
+    carried_by: implementer
+    agent_may_close: false
+    executable: true
+
+  - id: BUG
+    name: Bug
+    represents: A proven defect, with regression evidence
+    parent: [STORY, FEATURE]         # may attach at either level
+    carried_by: implementer
+    agent_may_close: false
+    executable: true
+
+  - id: ISSUE
+    name: Issue
+    represents: An impediment — tool, auth, dependency, ambiguity, scope conflict
+    parent: []                       # links to what it blocks via BLOCKS, not by parenting
+    carried_by: orchestrator
+    agent_may_close: false           # same as every other type — RULE-STATE-RESOLVED-NOT-CLOSED
+    executable: false
+
+hierarchy:
+  # Read top to bottom. Each line is "child may sit under parent".
+  - [FEATURE, EPIC]
+  - [STORY, FEATURE]
+  - [TASK, STORY]
+  - [BUG, STORY]
+  - [BUG, FEATURE]

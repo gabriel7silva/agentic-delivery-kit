@@ -1,0 +1,45 @@
+# Capabilities — the vocabulary a track uses to declare what its tool can do.
+# Canon: RULE-HONESTY. Consumed by check_mapping.py to build the compatibility matrix.
+#
+# A rule in rules.yml says `requires: [code_review]`. A track says
+# `code_review: false`. The matrix then marks that rule "substituted" if the
+# track declares a substitute, or "unsupported" if it does not.
+
+version: 1
+
+capabilities:
+  - id: sot_eligible
+    question: Can this tool be the single source of truth for work-item state?
+    needs: durable history, fields, comments, a stable id per item
+    note: A tool that fails this can only ever be a mirror or a notification surface
+
+  - id: durable_history
+    question: Are changes to an item kept, attributable and searchable indefinitely?
+
+  - id: custom_fields
+    question: Can arbitrary typed fields be added to an item?
+
+  - id: native_hierarchy
+    question: Does the tool link parent and child items natively (not via a text field)?
+
+  - id: comments
+    question: Can a role post a dated, attributable comment on an item?
+    note: Required by every transition — a conclusion comment has to live somewhere
+
+  - id: attachments
+    question: Can evidence (files, screenshots, logs) be attached or durably linked to an item?
+
+  - id: code_review
+    question: Is there a change-request object (pull request or equivalent) with reviewer verdicts?
+
+  - id: ci
+    question: Can deterministic verification run automatically on a change and report a status?
+
+  - id: iteration_native
+    question: Does the tool have a first-class iteration / sprint / milestone with dates?
+
+  - id: automation_hooks
+    question: Can an external process react to item changes (webhook, API, workflow engine)?
+
+  - id: queries
+    question: Can a saved query or view express "items in state X with field Y"?

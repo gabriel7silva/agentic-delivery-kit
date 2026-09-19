@@ -1,0 +1,57 @@
+# Example instance — agency, Azure DevOps as source of truth, Slack mirror.
+version: 1
+language: en
+topology: agent-to-human
+
+organization:
+  name: Acme Studio
+  product: Acme Client Portal
+  profile: agency
+
+source_of_truth:
+  track: azure-devops
+  board: Client Delivery
+
+mirrors:
+  - track: slack
+    purpose: notifications
+    channel: client-delivery-updates
+
+roles:
+  product_owner: { kind: human, title: Delivery Lead }
+  orchestrator: { kind: agent, title: Delivery Orchestrator }
+  implementer: { kind: agent, title: Implementer }
+  reviewers: { kind: agent, roster: agents/roster.yml }
+  approver: { kind: human, title: Client Approver }
+  qa: { kind: human, title: QA }
+  key_user: { kind: human, title: Key user }
+
+cadence:
+  timezone: UTC
+  iteration_length_days: 7
+  iteration_start_day: monday
+  sprint_close: friday
+  iteration_name_pattern: "Sprint {seq:02} {yy} Q{quarter} {product}"
+  sequence_resets: year
+  planning: start of iteration, on the start day
+  sync: daily
+  refinement: at sprint close
+  review: at sprint close, with the client
+  retrospective: at sprint close, internal
+
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  verification_commands: [make lint, make test]
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+  homologation_environment: HMS
+
+risk:
+  policy_file: agents/policies/risk-floors.yml
+  levels: [low, medium, high]
+
+optional_rules:
+  require_client_signoff: true
+  require_changelog_entry: true
+  require_iteration_report: true
+  require_homologation_qa: true

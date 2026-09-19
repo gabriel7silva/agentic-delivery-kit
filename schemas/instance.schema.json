@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/instance.schema.json",
+  "title": "PACT instance",
+  "description": "Validates instance.yml — the only file that knows who you are. Track names are free strings here; check_instance.py verifies the track exists and is sot_eligible.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "organization", "topology", "source_of_truth", "roles", "cadence", "conventions", "risk"],
+  "properties": {
+    "version": { "const": 1 },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+      "description": "BCP 47 tag (en, pt-BR, es). The language agents answer in and write artifacts in. The kit's own files stay in English."
+    },
+    "topology": {
+      "type": "string",
+      "enum": ["agent-to-human", "agent-to-agent", "independent-agents", "bot-team"],
+      "description": "Who fills the roles and who hands work to whom — core/15-topologies.md. check_instance.py cross-checks it with roles."
+    },
+    "organization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "profile"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "product": { "type": "string", "minLength": 1, "description": "What this instance delivers — {product} in cadence.iteration_name_pattern (RULE-ITERATION-NAMING)" },
+        "profile": { "type": "string", "enum": ["agency", "internal"] }
+      }
+    },
+    "source_of_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["track", "board"],
+      "properties": {
+        "track": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "board": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mirrors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["track", "purpose"],
+        "properties": {
+          "track": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "purpose": { "type": "string", "enum": ["notifications", "read-only-mirror"] },
+          "channel": { "type": "string" }
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_owner", "orchestrator", "implementer", "reviewers", "approver"],
+      "properties": {
+        "product_owner": { "$ref": "#/$defs/agentRole" },
+        "orchestrator": { "$ref": "#/$defs/agentRole" },
+        "implementer": { "$ref": "#/$defs/agentRole" },
+        "reviewers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "roster"],
+          "properties": {
+            "kind": { "const": "agent" },
+            "roster": { "type": "string" }
+          }
+        },
+        "approver": { "$ref": "#/$defs/humanRole" },
+        "qa": { "$ref": "#/$defs/humanRole" },
+        "key_user": { "$ref": "#/$defs/humanRole" }
+      }
+    },
+    "cadence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timezone", "iteration_length_days", "planning", "sync", "refinement", "review", "retrospective"],
+      "properties": {
+        "timezone": { "type": "string", "minLength": 1 },
+        "iteration_length_days": { "type": "integer", "minimum": 5, "maximum": 30 },
+        "iteration_start_day": { "$ref": "#/$defs/weekday", "description": "Planning day, first day of the iteration" },
+        "sprint_close": { "$ref": "#/$defs/weekday", "description": "Review, retrospective and refinement in one session on the last working day of the iteration (RULE-CEREMONY-SPRINT-CLOSE)" },
+        "iteration_name_pattern": { "type": "string", "minLength": 1, "description": "RULE-ITERATION-NAMING — placeholders seq, seq:02, yy, yyyy, quarter, half, product, start, end; default in core/model/iterations.yml" },
+        "sequence_resets": { "type": "string", "enum": ["year", "quarter", "never"] },
+        "planning": { "type": "string" },
+        "sync": { "type": "string" },
+        "refinement": { "type": "string" },
+        "review": { "type": "string" },
+        "retrospective": { "type": "string" }
+      }
+    },
+    "conventions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch_pattern", "verification_commands", "agent_context_file", "current_focus_file"],
+      "properties": {
+        "branch_pattern": { "type": "string", "minLength": 1 },
+        "verification_commands": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "agent_context_file": { "type": "string" },
+        "current_focus_file": { "type": "string" },
+        "homologation_environment": { "type": "string", "minLength": 1 },
+        "tags": {
+          "type": "object",
+          "description": "Tag families and their allowed values — core/04-work-item-model.md. needs-human must remain somewhere in them.",
+          "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+          "additionalProperties": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_file", "levels"],
+      "properties": {
+        "policy_file": { "type": "string" },
+        "levels": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+      }
+    },
+    "optional_rules": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Which of the model's WI-States this instance runs, and what it calls them. Categories can never be dropped; check_instance.py verifies.",
+      "properties": {
+        "states": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+        },
+        "labels": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[A-Z][A-Z0-9_]*$" },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "weekday": { "type": "string", "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] },
+    "humanRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "title"],
+      "properties": {
+        "kind": { "const": "human" },
+        "title": { "type": "string", "minLength": 1 }
+      }
+    },
+    "agentRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "title"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["agent", "human"] },
+        "title": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

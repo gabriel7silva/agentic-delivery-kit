@@ -1,0 +1,258 @@
+# Every RULE-… id in core/, with its canon file, the capabilities it requires
+# from a track, and whether an instance may switch it off.
+#
+# check_mapping.py crosses `requires` with each track's capabilities.yml and
+# writes docs/compatibility-matrix.md. check_instance.py refuses to toggle a
+# rule that is not `optional: true`. check_links.py verifies every `canon`
+# path exists and contains the id.
+
+version: 1
+
+rules:
+  # ── 01 roles
+  - id: RULE-ROLES
+    canon: core/01-roles.md
+    requires: []
+
+  # ── 02 golden rules
+  - id: RULE-GOLDEN
+    canon: core/02-golden-rules.md
+    requires: []
+  - id: RULE-GOLDEN-EVENTS
+    canon: core/02-golden-rules.md
+    requires: [comments]
+  - id: RULE-GOLDEN-HITL
+    canon: core/02-golden-rules.md
+    requires: []
+  - id: RULE-GOLDEN-SCOPE
+    canon: core/02-golden-rules.md
+    requires: []
+  - id: RULE-GOLDEN-NO-INVENTION
+    canon: core/02-golden-rules.md
+    requires: []
+  - id: RULE-GOLDEN-TRACE
+    canon: core/02-golden-rules.md
+    requires: [durable_history, comments]
+
+  # ── 03 human in the loop
+  - id: RULE-HITL
+    canon: core/03-human-in-the-loop.md
+    requires: [comments]
+
+  # ── 04 work-item model
+  - id: RULE-ITEM-MODEL
+    canon: core/04-work-item-model.md
+    requires: [custom_fields]
+  - id: RULE-TWO-AXES
+    canon: core/04-work-item-model.md
+    requires: [custom_fields]
+
+  # ── 05 states
+  - id: RULE-STATES
+    canon: core/05-states.md
+    requires: [custom_fields]
+  - id: RULE-PACT-PHASES
+    canon: core/05-states.md
+    requires: []
+  - id: RULE-STATE-RESOLVED-NOT-CLOSED
+    canon: core/05-states.md
+    requires: [custom_fields]
+  - id: RULE-STATE-REJECT
+    canon: core/05-states.md
+    requires: [comments]
+  - id: RULE-STATE-REMOVED
+    canon: core/05-states.md
+    requires: []
+  - id: RULE-STATE-CATEGORIES
+    canon: core/05-states.md
+    requires: [custom_fields]
+
+  # ── 06 ready and done
+  - id: RULE-DOR-DOD
+    canon: core/06-ready-and-done.md
+    requires: []
+  - id: RULE-DOR
+    canon: core/06-ready-and-done.md
+    requires: [attachments]
+  - id: RULE-DOD
+    canon: core/06-ready-and-done.md
+    requires: [attachments]
+
+  # ── 07 evidence
+  - id: RULE-EVIDENCE
+    canon: core/07-evidence.md
+    requires: [comments, attachments]
+  - id: RULE-CONCLUSION-COMMENT
+    canon: core/07-evidence.md
+    requires: [comments]
+  - id: RULE-TRANSITION-BARRIER
+    canon: core/07-evidence.md
+    requires: [comments]
+
+  # ── 08 review and risk
+  - id: RULE-REVIEW-RISK
+    canon: core/08-review-and-risk.md
+    requires: [code_review]
+  - id: RULE-REVIEW-GATE
+    canon: core/08-review-and-risk.md
+    requires: [code_review, ci]
+  - id: RULE-RISK
+    canon: core/08-review-and-risk.md
+    requires: [custom_fields]
+  - id: RULE-RISK-GATES
+    canon: core/08-review-and-risk.md
+    requires: [code_review, comments]
+
+  # ── 09 concurrency
+  - id: RULE-CONCURRENCY
+    canon: core/09-concurrency.md
+    requires: []
+  - id: RULE-SINGLE-WRITER
+    canon: core/09-concurrency.md
+    requires: []
+  - id: RULE-SCOPE
+    canon: core/09-concurrency.md
+    requires: []
+  - id: RULE-CLAIM
+    canon: core/09-concurrency.md
+    requires: [custom_fields, durable_history]
+  - id: RULE-ARBITRATION
+    canon: core/09-concurrency.md
+    requires: [comments]
+
+  # ── 10 merge rituals
+  - id: RULE-MERGE
+    canon: core/10-merge-rituals.md
+    requires: [code_review]
+  - id: RULE-MERGE-COMMON
+    canon: core/10-merge-rituals.md
+    requires: [code_review]
+
+  # ── 11 docs in the code
+  - id: RULE-DOCS-IN-CODE
+    canon: core/11-docs-in-the-code.md
+    requires: []
+  - id: RULE-CONTEXT-VS-TRAIL
+    canon: core/11-docs-in-the-code.md
+    requires: []
+
+  # ── 12 / 13
+  - id: RULE-ANTI-PATTERNS
+    canon: core/12-anti-patterns.md
+    requires: []
+  - id: RULE-HONESTY
+    canon: core/13-not-in-this-factory.md
+    requires: []
+
+  # ── 15 topologies
+  - id: RULE-TOPOLOGY
+    canon: core/15-topologies.md
+    requires: []
+  - id: RULE-TOPOLOGY-COORDINATION
+    canon: core/15-topologies.md
+    requires: [comments]
+
+  # ── 16 writing standard
+  - id: RULE-WRITING-STANDARD
+    canon: core/16-writing-standard.md
+    requires: []
+
+  # ── ceremonies
+  - id: RULE-CEREMONIES
+    canon: core/ceremonies/README.md
+    requires: [iteration_native]
+  - id: RULE-CEREMONY-META
+    canon: core/ceremonies/README.md
+    requires: []
+  - id: RULE-CEREMONY-PLANNING
+    canon: core/ceremonies/planning.md
+    requires: [iteration_native]
+  - id: RULE-CEREMONY-DAILY
+    canon: core/ceremonies/daily.md
+    requires: [queries]
+  - id: RULE-DAILY-DIGEST
+    canon: core/ceremonies/daily.md
+    requires: [queries, automation_hooks]
+  - id: RULE-CEREMONY-REFINEMENT
+    canon: core/ceremonies/refinement.md
+    requires: []
+  - id: RULE-REFINEMENT-DECISIONS
+    canon: core/ceremonies/refinement.md
+    requires: []
+  - id: RULE-CEREMONY-REVIEW
+    canon: core/ceremonies/review.md
+    requires: [comments, attachments]
+  - id: RULE-CEREMONY-RETRO
+    canon: core/ceremonies/retrospective.md
+    requires: []
+  - id: RULE-RETRO-INPUTS
+    canon: core/ceremonies/retrospective.md
+    requires: [queries]
+  - id: RULE-RETRO-CARDS
+    canon: core/ceremonies/retrospective.md
+    requires: [comments]
+  - id: RULE-ITERATION-NAMING
+    canon: core/ceremonies/README.md
+    requires: [iteration_native]
+  - id: RULE-CEREMONY-PARTICIPATION
+    canon: core/ceremonies/README.md
+    requires: [comments]
+  - id: RULE-CEREMONY-SPRINT-CLOSE
+    canon: core/ceremonies/sprint-close.md
+    requires: [iteration_native, comments, attachments, queries]
+  - id: RULE-CARRY-OVER
+    canon: core/ceremonies/sprint-close.md
+    requires: [iteration_native, comments]
+
+  # ── optional rules — toggled per instance under `optional_rules:`
+  - id: RULE-OPT-CLIENT-SIGNOFF
+    canon: core/ceremonies/review.md
+    requires: [attachments]
+    optional: true
+    instance_key: require_client_signoff
+    note: Acceptance must be a signed artifact from an external approver
+  - id: RULE-OPT-CHANGELOG
+    canon: core/10-merge-rituals.md
+    requires: []
+    optional: true
+    instance_key: require_changelog_entry
+    note: Every Closed item of type STORY or BUG has a changelog line
+  - id: RULE-OPT-ITERATION-REPORT
+    canon: core/ceremonies/review.md
+    requires: [queries]
+    optional: true
+    instance_key: require_iteration_report
+    note: A written iteration report is produced at Review
+  - id: RULE-HOMOLOG-QA
+    canon: core/14-homologation.md
+    requires: [comments]
+    optional: true
+    instance_key: require_homologation_qa
+  - id: RULE-HOMOLOG-READY
+    canon: core/14-homologation.md
+    requires: [custom_fields, comments]
+    optional: true
+    instance_key: require_homologation_qa
+  - id: RULE-KEY-USER-UPDATE
+    canon: core/14-homologation.md
+    requires: [comments]
+    optional: true
+    instance_key: require_homologation_qa
+  - id: RULE-OPT-HOMOLOG-QA
+    canon: core/14-homologation.md
+    requires: [custom_fields, comments]
+    optional: true
+    instance_key: require_homologation_qa
+    note: QA starts the homologation environment for the feature branch and links it; the key user tests there and updates the PO on the item before Closed
+  - id: RULE-OPT-SPRINT-METRICS
+    canon: core/ceremonies/planning.md
+    requires: [custom_fields, iteration_native, queries]
+    optional: true
+    instance_key: track_sprint_metrics
+    note: Effort, remaining work and business value live on the board fields; capacity per iteration is planned against them and the burndown is a view
+  - id: RULE-OPT-EXTERNAL-REF
+    canon: core/04-work-item-model.md
+    requires: [custom_fields]
+    optional: true
+    instance_key: require_external_ref
+    note: Every item that answers a request in another system carries that reference on the board field and in its title

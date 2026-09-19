@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pact/ownership.schema.json",
+  "title": "PACT scope ownership",
+  "description": "agents/ownership.yml — scope → paths → one writer + required reviewers. Overlap between scopes is rejected by check_schemas.py, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "default_scope", "scopes"],
+  "properties": {
+    "version": { "const": 1 },
+    "default_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["writer", "reviewers", "floor"],
+      "properties": {
+        "writer": { "type": "string" },
+        "reviewers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "floor": { "type": "string", "enum": ["low", "medium", "high"] }
+      }
+    },
+    "scopes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "paths", "writer", "reviewers", "floor"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "description": { "type": "string" },
+          "paths": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "writer": { "type": "string" },
+          "reviewers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "floor": { "type": "string", "enum": ["low", "medium", "high"] }
+        }
+      }
+    }
+  }
+}

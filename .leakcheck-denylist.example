@@ -1,0 +1,15 @@
+# Leak denylist — copy to `.leakcheck-denylist` (git-ignored) and add terms.
+#
+# A committed list of secrets-to-avoid is itself an index of what you are hiding.
+# Keep real names out of git. CI reads the same terms from the PACT_DENYLIST secret.
+#
+# One uncommented line per literal (case-insensitive). Lines starting with # are
+# ignored. At least one term is required to arm the denylist layer; until then
+# check_leaks prints a note and runs structural rules only.
+#
+# Do not list a term that still appears in this repository: L0 and
+# test_leaks_pass_on_kit will fail, which is the point.
+#
+# employer-name
+# product-codename
+# person-name

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" width="960" height="320" role="img" aria-label="Symbols mapped per track out of 35: native in green, custom field in grey, substituted in orange. Azure DevOps 27 native, GitHub Projects 14, Notion 6, Spreadsheet 0, Slack 1. Slack cannot be the source of truth; a spreadsheet only when hosted.">
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      animate, animateTransform, animateMotion { display: none; }
+    }
+  </style>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+    <text x="40" y="28" font-size="13" fill="#8b949e" letter-spacing="2" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">FIVE TOOLS — ONE CONTRACT — 35 SYMBOLS</text>
+    <text x="920" y="28" text-anchor="end" font-size="13" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">nothing silently missing</text>
+
+    <g font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+      <rect x="40" y="44" width="12" height="12" rx="2" fill="#3fb950"/>
+      <text x="58" y="55" fill="#8b949e">native</text>
+      <rect x="130" y="44" width="12" height="12" rx="2" fill="#8b949e"/>
+      <text x="148" y="55" fill="#8b949e">custom field</text>
+      <rect x="268" y="44" width="12" height="12" rx="2" fill="#f0883e"/>
+      <text x="286" y="55" fill="#8b949e">substituted</text>
+    </g>
+
+    <g font-size="11" fill="#6e7681" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+      <line x1="220" y1="78" x2="220" y2="270" stroke="#6e7681" stroke-width="1"/>
+      <line x1="220" y1="270" x2="820" y2="270" stroke="#8b949e" stroke-width="2"/>
+      <line x1="220" y1="78" x2="820" y2="78" stroke="#6e7681" stroke-width="1" stroke-dasharray="3 5"/>
+      <text x="206" y="274" text-anchor="end">0</text>
+      <text x="206" y="82" text-anchor="end">35</text>
+    </g>
+
+    <text x="40" y="108" font-size="13" fill="#8b949e">Azure DevOps</text>
+    <rect x="220" y="92" height="22" rx="4" fill="#3fb950">
+      <animate attributeName="width" values="0;463;463" keyTimes="0;0.45;1" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="92" height="22" rx="4" fill="#8b949e">
+      <animate attributeName="x" values="220;683;683" keyTimes="0;0.45;1" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;137;137" keyTimes="0;0.45;1" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <text x="836" y="108" font-size="12" fill="#3fb950" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">27 + 8 — SoT</text>
+
+    <text x="40" y="148" font-size="13" fill="#8b949e">GitHub Projects</text>
+    <rect x="220" y="132" height="22" rx="4" fill="#3fb950">
+      <animate attributeName="width" values="0;240;240" keyTimes="0;0.45;1" dur="4s" begin="0.15s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="132" height="22" rx="4" fill="#8b949e">
+      <animate attributeName="x" values="220;460;460" keyTimes="0;0.45;1" dur="4s" begin="0.15s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;360;360" keyTimes="0;0.45;1" dur="4s" begin="0.15s" repeatCount="indefinite"/>
+    </rect>
+    <text x="836" y="148" font-size="12" fill="#3fb950" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">14 + 21 — SoT</text>
+
+    <text x="40" y="188" font-size="13" fill="#8b949e">Notion</text>
+    <rect x="220" y="172" height="22" rx="4" fill="#3fb950">
+      <animate attributeName="width" values="0;103;103" keyTimes="0;0.45;1" dur="4s" begin="0.3s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="172" height="22" rx="4" fill="#8b949e">
+      <animate attributeName="x" values="220;323;323" keyTimes="0;0.45;1" dur="4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;463;463" keyTimes="0;0.45;1" dur="4s" begin="0.3s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="172" height="22" rx="4" fill="#f0883e">
+      <animate attributeName="x" values="220;786;786" keyTimes="0;0.45;1" dur="4s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;34;34" keyTimes="0;0.45;1" dur="4s" begin="0.3s" repeatCount="indefinite"/>
+    </rect>
+    <text x="836" y="188" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">6 + 27 + 2 — SoT</text>
+
+    <text x="40" y="228" font-size="13" fill="#8b949e">Spreadsheet</text>
+    <rect y="212" height="22" rx="4" fill="#8b949e">
+      <animate attributeName="x" values="220;220;220" keyTimes="0;0.45;1" dur="4s" begin="0.45s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;531;531" keyTimes="0;0.45;1" dur="4s" begin="0.45s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="212" height="22" rx="4" fill="#f0883e">
+      <animate attributeName="x" values="220;751;751" keyTimes="0;0.45;1" dur="4s" begin="0.45s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;69;69" keyTimes="0;0.45;1" dur="4s" begin="0.45s" repeatCount="indefinite"/>
+    </rect>
+    <text x="836" y="228" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">0 + 31 + 4 — SoT</text>
+
+    <text x="40" y="268" font-size="13" fill="#8b949e">Slack</text>
+    <rect x="220" y="252" height="22" rx="4" fill="#3fb950">
+      <animate attributeName="width" values="0;19;19" keyTimes="0;0.45;1" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="252" height="22" rx="4" fill="#8b949e">
+      <animate attributeName="x" values="220;239;239" keyTimes="0;0.45;1" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;429;429" keyTimes="0;0.45;1" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+    </rect>
+    <rect y="252" height="22" rx="4" fill="#f0883e">
+      <animate attributeName="x" values="220;666;666" keyTimes="0;0.45;1" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="width" values="0;154;154" keyTimes="0;0.45;1" dur="4s" begin="0.6s" repeatCount="indefinite"/>
+    </rect>
+    <text x="836" y="262" font-size="12" fill="#f85149" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">1 + 25 + 9</text>
+    <text x="836" y="277" font-size="12" fill="#f85149" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">never SoT</text>
+  </g>
+</svg>

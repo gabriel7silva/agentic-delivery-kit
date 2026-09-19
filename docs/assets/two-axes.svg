@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 250" width="960" height="250" role="img" aria-label="Two state axes. Agents may set a Resolved-category state and its board column. Only a human sets Closed and Done.">
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      animate, animateTransform, animateMotion { display: none; }
+    }
+  </style>
+  <defs>
+    <marker id="ax-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker>
+    <marker id="ax-o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f0883e"/></marker>
+    <filter id="ax-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <path id="ax-wi" d="M110,88 L290,88 L470,88"/>
+    <path id="ax-bo" d="M90,178 L221,178 L367,178 L528,178"/>
+  </defs>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+    <text x="40" y="28" font-size="13" fill="#8b949e" letter-spacing="2" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">TWO AXES - NEVER COLLAPSED</text>
+    <text x="920" y="28" text-anchor="end" font-size="13" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">agents stop at Resolved</text>
+
+    <text x="40" y="58" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">WI-State category - who did the work</text>
+    <g text-anchor="middle" font-size="13" font-weight="700">
+      <rect x="50" y="68" width="120" height="40" rx="8" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="110" y="94" fill="#8b949e">New</text>
+      <line x1="170" y1="88" x2="218" y2="88" stroke="#8b949e" stroke-width="2" marker-end="url(#ax-g)"/>
+      <rect x="226" y="68" width="120" height="40" rx="8" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="286" y="94" fill="#8b949e">Active</text>
+      <line x1="346" y1="88" x2="394" y2="88" stroke="#8b949e" stroke-width="2" marker-end="url(#ax-g)"/>
+      <rect x="402" y="68" width="120" height="40" rx="8" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <text x="462" y="94" fill="#3fb950">Resolved</text>
+      <line x1="522" y1="88" x2="578" y2="88" stroke="#f0883e" stroke-width="2" marker-end="url(#ax-o)"/>
+      <rect x="586" y="68" width="140" height="40" rx="8" fill="none" stroke="#f0883e" stroke-width="2.5">
+        <animate attributeName="stroke-opacity" values="1;0.45;1" dur="2.4s" repeatCount="indefinite"/>
+      </rect>
+      <text x="656" y="94" fill="#f0883e">Closed</text>
+    </g>
+    <g transform="translate(780,88)">
+      <circle cy="-12" r="5" fill="#f0883e"/>
+      <path d="M-8,4 Q0,-6 8,4" fill="none" stroke="#f0883e" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="18" y="4" font-size="11" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">human only</text>
+    </g>
+
+    <text x="40" y="148" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Board column - where the team looks - 11 columns, 5 shown</text>
+    <g text-anchor="middle" font-size="12" font-weight="700">
+      <rect x="40" y="158" width="100" height="40" rx="8" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="90" y="184" fill="#8b949e">Backlog</text>
+      <line x1="140" y1="178" x2="168" y2="178" stroke="#8b949e" stroke-width="2" marker-end="url(#ax-g)"/>
+      <rect x="176" y="158" width="90" height="40" rx="8" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="221" y="184" fill="#8b949e">Ready</text>
+      <line x1="266" y1="178" x2="294" y2="178" stroke="#8b949e" stroke-width="2" marker-end="url(#ax-g)"/>
+      <rect x="302" y="158" width="130" height="40" rx="8" fill="none" stroke="#8b949e" stroke-width="2"/>
+      <text x="367" y="184" fill="#8b949e">In development</text>
+      <line x1="432" y1="178" x2="460" y2="178" stroke="#8b949e" stroke-width="2" marker-end="url(#ax-g)"/>
+      <rect x="468" y="158" width="120" height="40" rx="8" fill="none" stroke="#3fb950" stroke-width="2"/>
+      <text x="528" y="184" fill="#3fb950">Awaiting test</text>
+      <line x1="588" y1="178" x2="624" y2="178" stroke="#f0883e" stroke-width="2" marker-end="url(#ax-o)"/>
+      <rect x="632" y="158" width="120" height="40" rx="8" fill="none" stroke="#f0883e" stroke-width="2.5">
+        <animate attributeName="stroke-opacity" values="1;0.45;1" dur="2.4s" begin="0.4s" repeatCount="indefinite"/>
+      </rect>
+      <text x="692" y="184" fill="#f0883e">Done</text>
+    </g>
+    <g transform="translate(780,178)">
+      <circle cy="-12" r="5" fill="#f0883e"/>
+      <path d="M-8,4 Q0,-6 8,4" fill="none" stroke="#f0883e" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="18" y="4" font-size="11" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">human only</text>
+    </g>
+
+    <path d="M462,108 L528,158" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <path d="M656,108 L692,158" fill="none" stroke="#f0883e" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <text x="522" y="140" font-size="11" fill="#3fb950" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">agents may set</text>
+    <text x="700" y="140" font-size="11" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">humans only</text>
+
+    <circle r="6" fill="#3fb950" filter="url(#ax-glow)">
+      <animateMotion dur="5s" repeatCount="indefinite"><mpath href="#ax-wi"/></animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.72;1" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="6" fill="#3fb950" filter="url(#ax-glow)">
+      <animateMotion dur="5s" begin="0.4s" repeatCount="indefinite"><mpath href="#ax-bo"/></animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.72;1" dur="5s" begin="0.4s" repeatCount="indefinite"/>
+    </circle>
+
+    <text x="480" y="230" text-anchor="middle" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the pulse never enters Closed or Done on its own</text>
+  </g>
+</svg>

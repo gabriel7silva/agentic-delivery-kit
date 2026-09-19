@@ -1,0 +1,110 @@
+# Review gates and evidence types. Canon: RULE-REVIEW-GATE · RULE-RISK-GATES · RULE-EVIDENCE
+
+version: 1
+
+gates:
+  - id: VERIFICATION
+    name: Deterministic verification
+    performed_by: machine
+    input: instance.yml conventions.verification_commands
+    produces: [VERIFICATION_PASSED]
+    requires_capability: ci
+    substitute_if_missing: A human runs the commands locally and attaches the output
+
+  - id: PEER_REVIEW
+    name: Agent review
+    performed_by: reviewer
+    parallel: true
+    read_only: true                  # RULE-SINGLE-WRITER
+    produces: [REVIEW_GATE_PASSED, RISK_VERDICT]
+    requires_capability: code_review
+    substitute_if_missing: Reviewer posts the verdict block as a comment on the item, with a link to the diff
+
+  - id: HUMAN_REVIEW
+    name: Named human review before Resolved
+    performed_by: human
+    when: RISK == high
+    produces: [HUMAN_GATE_IF_HIGH]
+    requires_capability: comments
+
+  - id: APPROVAL
+    name: Acceptance
+    performed_by: approver
+    produces: [HUMAN_ACCEPTANCE]
+    requires_capability: comments
+
+  - id: HOMOLOGATION
+    name: Homologation environment ready for the key user
+    performed_by: qa
+    when: optional_rules.require_homologation_qa
+    produces: [HOMOLOG_READY]
+    requires_capability: comments
+
+  - id: KEY_USER_TEST
+    name: Key user tests on the linked homologation environment
+    performed_by: key_user
+    when: optional_rules.require_homologation_qa
+    produces: [KEY_USER_UPDATE]
+    requires_capability: comments
+
+verdict_shape:
+  # What every PEER_REVIEW returns, so tooling can read it.
+  verdict: [pass, pass-with-findings, block]
+  risk: [low, medium, high]
+  finding:
+    severity: [blocking, non-blocking]
+    where: string
+    what: string
+
+evidence_types:
+  # Referenced by transitions.yml `requires`.
+  - id: DOR_SATISFIED
+    proof: Every Definition of Ready line checked, on the item or in the handoff
+  - id: HANDOFF
+    proof: A filled templates/flow/handoff.md linked from the item
+  - id: CLAIM_OPEN
+    proof: A CLAIM record on the item with holder, scope, timestamps
+  - id: CLAIM_RELEASED
+    proof: A release record on the item
+  - id: VERIFICATION_PASSED
+    proof: Command output with exit status, attached or linked
+  - id: REVIEW_GATE_PASSED
+    proof: One verdict block per required reviewer; no blocking finding open
+  - id: RISK_VERDICT
+    proof: The risk field set to MAX(verdicts, floors)
+  - id: RISK_GATE_SATISFIED
+    proof: What agents/policies/gates.yml demands for the computed level
+  - id: RECEIPT
+    proof: A filled templates/flow/receipt.md including "Not verified / not claimed"
+  - id: CONCLUSION_COMMENT
+    proof: The six fields, on the item
+  - id: HUMAN_GATE_IF_HIGH
+    proof: A named human's review comment before RESOLVED, when risk is high
+  - id: HUMAN_ACCEPTANCE
+    proof: The Approver's acceptance in writing, on the item
+  - id: HOMOLOG_READY
+    proof: BRANCH and HOMOLOG_LINK on the board; QA posted that the environment is up for that branch
+  - id: KEY_USER_UPDATE
+    proof: The key user tested on that HOMOLOG_LINK and posted the result plus the PO update on the item
+  - id: REJECTION_NOTE
+    proof: One objective note naming the failing AC and what would satisfy it
+  - id: REMOVAL_REASON
+    proof: One line on the item saying why
+  - id: RETURN_REASON
+    proof: The carry-over decision `return` and its reason, on the item, at the sprint close (RULE-CARRY-OVER)
+
+risk_levels:
+  # Ascending. The last level always requires a human gate before RESOLVED.
+  - id: low
+    to_resolved: [VERIFICATION, PEER_REVIEW]
+    min_reviewers: 1
+    to_closed: [APPROVAL, HOMOLOGATION, KEY_USER_TEST]  # last two when require_homologation_qa
+  - id: medium
+    to_resolved: [VERIFICATION, PEER_REVIEW]
+    min_reviewers: all_scope_reviewers
+    to_closed: [APPROVAL, HOMOLOGATION, KEY_USER_TEST]
+  - id: high
+    to_resolved: [VERIFICATION, PEER_REVIEW, HUMAN_REVIEW]
+    min_reviewers: all_scope_reviewers
+    to_closed: [APPROVAL, HOMOLOGATION, KEY_USER_TEST]
+    approval_in_writing: true

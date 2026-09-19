@@ -1,0 +1,30 @@
+# Fixture — must be REJECTED: "DONE" is a column, not a state.
+version: 1
+topology: agent-to-human
+language: en
+organization: { name: Acme Corp, profile: internal }
+source_of_truth: { track: github-projects, board: Delivery }
+roles:
+  product_owner: { kind: human, title: Product Owner }
+  orchestrator: { kind: agent, title: Orchestrator }
+  implementer: { kind: agent, title: Implementer }
+  reviewers: { kind: agent, roster: agents/roster.yml }
+  approver: { kind: human, title: Product Owner }
+cadence:
+  timezone: UTC
+  iteration_length_days: 14
+  planning: start of iteration
+  sync: daily
+  refinement: weekly
+  review: end of iteration
+  retrospective: end of iteration
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  verification_commands: [make test]
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+risk: { policy_file: agents/policies/risk-floors.yml, levels: [low, medium, high] }
+lifecycle:
+  states: [NEW, AWAITING_DEVELOPMENT, IN_DEVELOPMENT, AWAITING_TEST, DONE, CLOSED, REMOVED]
+  labels:
+    DONE: Finished

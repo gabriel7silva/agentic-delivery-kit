@@ -1,0 +1,56 @@
+# Example instance — internal team, Notion as source of truth (review gate substituted), Slack mirror.
+version: 1
+language: en
+topology: independent-agents
+
+organization:
+  name: Acme Corp
+  product: Acme Portal
+  profile: internal
+
+source_of_truth:
+  track: notion
+  board: Work items
+
+mirrors:
+  - track: slack
+    purpose: notifications
+    channel: delivery-updates
+
+roles:
+  product_owner: { kind: human, title: Product Owner }
+  orchestrator: { kind: human, title: Product Owner }   # independent-agents: the PO dispatches each item
+  implementer: { kind: agent, title: Implementer }
+  reviewers: { kind: agent, roster: agents/roster.yml }
+  approver: { kind: human, title: Product Owner }
+  qa: { kind: human, title: QA }
+  key_user: { kind: human, title: Key user }
+
+cadence:
+  timezone: UTC
+  iteration_length_days: 7
+  iteration_start_day: monday
+  sprint_close: friday
+  iteration_name_pattern: "Sprint {seq:02} {yy} Q{quarter} {product}"
+  sequence_resets: year
+  planning: start of iteration, on the start day
+  sync: daily
+  refinement: at sprint close
+  review: at sprint close
+  retrospective: at sprint close
+
+conventions:
+  branch_pattern: "{type}/{item-id}-{slug}"
+  verification_commands: [make test]
+  agent_context_file: AGENT-CONTEXT.md
+  current_focus_file: CURRENT-FOCUS.md
+
+risk:
+  policy_file: agents/policies/risk-floors.yml
+  levels: [low, medium, high]
+
+optional_rules:
+  require_client_signoff: false
+  require_changelog_entry: true
+  require_iteration_report: false
+  require_homologation_qa: false

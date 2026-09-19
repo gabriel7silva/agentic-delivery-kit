@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 180" width="960" height="180" role="img" aria-label="Five human-in-the-loop triggers. Each one, on its own, stops the agent and hands off to a named human. The PR validator binds high risk; these five are conditions for the orchestrator.">
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      animate, animateTransform, animateMotion { display: none; }
+    }
+  </style>
+  <defs>
+    <marker id="ht-o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f0883e"/></marker>
+  </defs>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+    <text x="40" y="28" font-size="13" fill="#8b949e" letter-spacing="2" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">HUMAN IN THE LOOP</text>
+    <text x="920" y="28" text-anchor="end" font-size="13" fill="#f0883e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">five triggers -- any one is enough</text>
+
+    <g text-anchor="middle" font-size="12">
+      <g transform="translate(70,88)">
+        <rect x="-58" y="-36" width="116" height="72" rx="10" fill="none" stroke="#8b949e" stroke-width="2">
+          <animate attributeName="stroke" values="#f0883e;#8b949e;#8b949e;#8b949e;#8b949e;#8b949e" keyTimes="0;0.16;0.2;0.4;0.7;1" dur="6s" repeatCount="indefinite"/>
+        </rect>
+        <text y="-6" fill="#8b949e" font-weight="700">1 -- money</text>
+        <text y="14" fill="#8b949e" font-size="11">credentials -- access</text>
+      </g>
+      <g transform="translate(210,88)">
+        <rect x="-58" y="-36" width="116" height="72" rx="10" fill="none" stroke="#8b949e" stroke-width="2">
+          <animate attributeName="stroke" values="#8b949e;#f0883e;#8b949e;#8b949e;#8b949e;#8b949e" keyTimes="0;0.16;0.32;0.36;0.7;1" dur="6s" repeatCount="indefinite"/>
+        </rect>
+        <text y="-6" fill="#8b949e" font-weight="700">2 -- publish</text>
+        <text y="14" fill="#8b949e" font-size="11">release -- client</text>
+      </g>
+      <g transform="translate(350,88)">
+        <rect x="-58" y="-36" width="116" height="72" rx="10" fill="none" stroke="#8b949e" stroke-width="2">
+          <animate attributeName="stroke" values="#8b949e;#8b949e;#f0883e;#8b949e;#8b949e;#8b949e" keyTimes="0;0.32;0.48;0.52;0.7;1" dur="6s" repeatCount="indefinite"/>
+        </rect>
+        <text y="-6" fill="#8b949e" font-weight="700">3 -- irreversible</text>
+        <text y="14" fill="#8b949e" font-size="11">delete -- contract</text>
+      </g>
+      <g transform="translate(490,88)">
+        <rect x="-58" y="-36" width="116" height="72" rx="10" fill="none" stroke="#8b949e" stroke-width="2">
+          <animate attributeName="stroke" values="#8b949e;#8b949e;#8b949e;#f0883e;#8b949e;#8b949e" keyTimes="0;0.48;0.52;0.64;0.68;1" dur="6s" repeatCount="indefinite"/>
+        </rect>
+        <text y="-6" fill="#8b949e" font-weight="700">4 -- ambiguity</text>
+        <text y="14" fill="#8b949e" font-size="11">conflict -- missing rule</text>
+      </g>
+      <g transform="translate(630,88)">
+        <rect x="-58" y="-36" width="116" height="72" rx="10" fill="none" stroke="#8b949e" stroke-width="2">
+          <animate attributeName="stroke" values="#8b949e;#8b949e;#8b949e;#8b949e;#f0883e;#8b949e" keyTimes="0;0.64;0.68;0.72;0.84;1" dur="6s" repeatCount="indefinite"/>
+        </rect>
+        <text y="-6" fill="#8b949e" font-weight="700">5 -- invention</text>
+        <text y="14" fill="#8b949e" font-size="11">would have to guess</text>
+      </g>
+    </g>
+
+    <line x1="696" y1="88" x2="778" y2="88" stroke="#f0883e" stroke-width="2" marker-end="url(#ht-o)">
+      <animate attributeName="stroke-opacity" values="0.35;1;0.35" dur="2s" repeatCount="indefinite"/>
+    </line>
+
+    <g transform="translate(850,88)" text-anchor="middle">
+      <circle cx="0" cy="-14" r="6" fill="#f0883e">
+        <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M-9,4 Q0,-8 9,4" fill="none" stroke="#f0883e" stroke-width="2.5" stroke-linecap="round"/>
+      <text y="28" font-size="12" fill="#f0883e" font-weight="700">named human</text>
+    </g>
+
+    <text x="480" y="164" text-anchor="middle" font-size="12" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the item stays put -- a comment names the trigger -- the orchestrator moves on</text>
+  </g>
+</svg>

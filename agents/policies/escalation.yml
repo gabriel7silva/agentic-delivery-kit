@@ -1,0 +1,72 @@
+# Human-in-the-loop triggers as checkable conditions. Schema: schemas/policies.schema.json (policy: escalation)
+# Canon: RULE-HITL
+#
+# Each condition is written so that an orchestrator or a reviewer can test it
+# against a diff, an item or a handoff — not so that an agent "notices".
+# The PR validator binds risk == high only. These five triggers are advisory
+# in the gate until they are expressed as that high-risk property.
+# When any condition holds, the current step stops and a gate is opened for
+# the role in `decides`.
+
+version: 1
+policy: escalation
+
+triggers:
+  - id: money-access
+    canon: RULE-HITL
+    decides: approver
+    conditions:
+      - diff touches a path under a scope whose description mentions credentials, billing or permissions
+      - diff adds or changes an API key, token, secret reference or environment variable name matching *KEY*, *TOKEN*, *SECRET*
+      - handoff or item mentions paying, purchasing, granting or widening access
+    examples:
+      - Creating a service token
+      - Widening a CI job's permissions block
+
+  - id: external-publication
+    canon: RULE-HITL
+    decides: approver
+    conditions:
+      - diff touches release, deploy or publish configuration
+      - item type is STORY and an acceptance criterion names a client, an external user or a public endpoint
+      - the change would send anything to an address outside the team
+    examples:
+      - Tagging a release
+      - Sending a report to a client
+
+  - id: irreversible
+    canon: RULE-HITL
+    decides: product_owner
+    conditions:
+      - diff deletes data, a migration drops or truncates, or a public contract changes shape
+      - diff removes a feature an acceptance criterion elsewhere still names
+    examples:
+      - Dropping a column
+      - Removing an endpoint
+
+  - id: ambiguity
+    canon: RULE-HITL
+    decides: product_owner
+    conditions:
+      - two acceptance criteria on the item contradict each other
+      - a business rule the change depends on is not written on the item, in the handoff, or in agent context
+      - the implementer's receipt contains an honest placeholder on an acceptance criterion
+    examples:
+      - AC1 says all rows, the list hides archived rows
+
+  - id: invention-risk
+    canon: RULE-HITL
+    decides: product_owner
+    conditions:
+      - completing the item requires a value, a name, a threshold or a stakeholder intent that no source provides
+      - the receipt would have to assert something no tool output supports
+    examples:
+      - Choosing a retention period nobody specified
+
+  - id: risk-high
+    canon: RULE-RISK
+    decides: approver
+    conditions:
+      - computed risk MAX(verdicts, floors) == high
+    examples:
+      - Any change under a high-floor path
